@@ -1,10 +1,10 @@
 package controllers
 
-import "C"
 import (
 	"github.com/astaxie/beego"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/gocolly/colly"
+	"pick/conf"
+	"pick/service"
 )
 
 type PickController struct {
@@ -13,24 +13,14 @@ type PickController struct {
 
 func (p * PickController) Get() {
 	domin := "https://www.webtoon.xyz/read/ring-my-bell/"
-	spew.Dump(domin)
-	c := colly.NewCollector()
-	// Find and visit all links
-	c.OnXML("//body/div[1]/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[4]/div[1]/ul[1]/li", func(e *colly.XMLElement) {
-		//e.Request.Visit(e.Attr("li"))
-		link := e.ChildText("//a[1]/@href")
-		title := e.ChildText("//a[1]/text()")
-		//var ele  = NewXMLElement(e)
-		//content := ele.ChildHtml(con.Content)
-		spew.Dump(link,title)
-	})
-	c.OnXML("//body/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]", func(e *colly.XMLElement) {
-		//e.Request.Visit(e.Attr("li"))
-		links := e.ChildText("//h1")
-		//var ele  = NewXMLElement(e)
-		//content := ele.ChildHtml(con.Content)
-		spew.Dump(links)
-	})
-	c.Visit("https://www.webtoon.xyz/read/ring-my-bell/")
+	//获取指定规则
+	role := conf.Choose(1)
+	//爬取图书
+	bookInfo, chapterInfo := service.BookInfo(role, domin)
+	//spew.Dump(bookInfo, chapterInfo)
+	for k, v := range bookInfo {
+		spew.Dump(k, v)
+	}
+	p.Data["json"] = chapterInfo
 	p.ServeJSON()
 }
