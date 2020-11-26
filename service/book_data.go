@@ -3,10 +3,13 @@ package service
 import (
 	"github.com/gocolly/colly"
 	"pick/conf"
+	"pick/util"
 )
 
 //书目录
 func BookInfo(role *conf.MainRule, domin string) ([]map[string]string, []map[string]string) {
+	//新建目录,没有就新建->返回目录名
+	dir := util.ThisMkdir(domin)
 	//图书信息
 	bookInfo := []map[string]string{}
 	//章节信息
@@ -15,11 +18,13 @@ func BookInfo(role *conf.MainRule, domin string) ([]map[string]string, []map[str
 	c := colly.NewCollector()
 	// Find and visit all links
 	c.OnXML(role.Table, func(e *colly.XMLElement) {
-		//章节链接
-		link := e.ChildText(role.Title)
-		img := GetDetail(role,link)
 		//章节名
 		title := e.ChildText(role.Link)
+		//创建章节目录
+		//util.MKdirs(dir+"\\"+title)
+		//章节链接
+		link := e.ChildText(role.Title)
+		img := GetDetail(role, link, dir+"\\"+title)
 		chapterInfo = append(
 			chapterInfo,
 			map[string]string{"link": link, "title": title, "imgs": img})
@@ -47,79 +52,25 @@ func BookInfo(role *conf.MainRule, domin string) ([]map[string]string, []map[str
 
 		bookInfo = append(
 			bookInfo,
-			map[string]string{"name": name, "year": year, "star": star, "author": author, "status": status, "intro": intro, "types": types, "tags": tags, "image":image})
+			map[string]string{"name": name, "year": year, "star": star, "author": author, "status": status, "intro": intro, "types": types, "tags": tags, "image": image})
 	})
 	c.Visit(domin)
 	return bookInfo, chapterInfo
 }
 
-func GetDetail(role *conf.MainRule, domin string) string {
+func GetDetail(role *conf.MainRule, domin string, file_name string) string {
 	cs := colly.NewCollector()
 	var img string
 	cs.OnXML(role.Detail, func(e *colly.XMLElement) {
 		//章节链接
-		img += e.ChildText(role.ImgSrc)+","
+		imgLink := e.ChildText(role.ImgSrc)
+		//存入指定图片目录
+		//imgArr := strings.Split(imgLink, "/")
+		//name := imgArr[len(imgArr)-1]
+		//util.DownloadJpg(imgLink, file_name+"\\"+name)
+		img += imgLink+","
 	})
 	cs.Visit(domin)
 	return  img
 }
 
-//书正文
-//func BookContent(con models.Content, links string) []map[string]string {
-//	c := colly.NewCollector()
-//	info := []map[string]string{}
-//	c.OnXML(con.Root, func(e *colly.XMLElement) {
-//		name := e.ChildText(con.Name)
-//		var ele  = NewXMLElement(e)
-//		content := ele.ChildHtml(con.Content)
-//		s_page := ""
-//		x_page := ""
-//		list := ""
-//		switch con.Id {
-//			case 3:
-//				s_page = con.Domain + e.ChildText(con.SPage)
-//				x_page = con.Domain + e.ChildText(con.XPage)
-//				list = con.Domain + e.ChildText(con.List)
-//				break
-//			default:
-//				s_page = e.ChildText(con.SPage)
-//				x_page = e.ChildText(con.XPage)
-//				list = e.ChildText(con.List)
-//				break
-//		}
-//		info = append(
-//			info,
-//			map[string]string{"name": name, "content": content, "s_page": s_page, "x_page": x_page, "list": list})
-//	})
-//	c.Visit(links)
-//	return info
-//}
-////书图片,简介
-//func BookSynosis(con models.Synopsis, links string) []map[string]string  {
-//	c := colly.NewCollector()
-//	info := []map[string]string{}
-//	c.OnXML(con.Root, func(e *colly.XMLElement) {
-//		name := e.ChildText(con.Name)
-//		writer := e.ChildText(con.Writer)
-//		img := e.ChildText(con.Img)
-//		synopsis := e.ChildText(con.Synopsis)
-//		renew_time := e.ChildText(con.RenewTime)
-//		info = append(
-//			info,
-//			map[string]string{"name": name, "writer": writer, "img": img, "synopsis": synopsis, "renew_time": renew_time})
-//	})
-//	c.Visit(links)
-//	return info
-//}
-//
-////检测书本是否更新
-//func BookSynosisCheck(con models.Synopsis, links string) string  {
-//	c := colly.NewCollector()
-//	info := ""
-//	c.OnXML(con.Root, func(e *colly.XMLElement) {
-//		renew_time := e.ChildText(con.RenewTime)
-//		info = renew_time
-//	})
-//	c.Visit(links)
-//	return info
-//}

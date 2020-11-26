@@ -1,11 +1,12 @@
 package main
 
 import (
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/plugins/cors"
+	_ "github.com/go-sql-driver/mysql"
 	"pick/models"
 	_ "pick/routers"
-	"github.com/astaxie/beego"
 )
 
 func init()  {
