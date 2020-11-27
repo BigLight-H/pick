@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/astaxie/beego"
 	"github.com/garyburd/redigo/redis"
 	"time"
 )
@@ -8,7 +9,7 @@ import (
 func ConnectRedisPool() redis.Conn {
 	connPool := &redis.Pool{
 		Dial: func() (conn redis.Conn, err error) {
-			conn, err = redis.Dial("tcp", "127.0.0.1:6379")
+			conn, err = redis.Dial("tcp", beego.AppConfig.String("redis_addr"))
 			if err != nil {
 				return nil, err
 			}
@@ -23,5 +24,10 @@ func ConnectRedisPool() redis.Conn {
 	}
 
 	return connPool.Get()
+}
+
+func ConnectRedis() redis.Conn {
+	conn, _ := redis.Dial("tcp", beego.AppConfig.String("redis_addr"))
+	return conn
 }
 

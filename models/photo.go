@@ -5,6 +5,7 @@ type Photo struct {
 	ChapterId int
 	PicOrder  string
 	ImgUrl  string
+	BookId  int
 }
 
 func (m *Photo) TableName() string {

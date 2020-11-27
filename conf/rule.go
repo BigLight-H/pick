@@ -35,6 +35,8 @@ type MainRule struct {
 	Image  string //图片链接
 	Detail string //图片详情页规则
 	ImgSrc string //图片链接
+	LTime  string //最后更新时间
+	CTime  string //章节更新时间
 }
 
 func Choose(id int) *MainRule {
@@ -55,6 +57,8 @@ func Choose(id int) *MainRule {
 			Link : "//a[1]/text()",
 			Detail : "//body/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[2]/div[position()<last()]",
 			ImgSrc : "//img/@data-src",
+			LTime : "//div[1]/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[4]/div[1]/ul[1]/li[1]/span",
+			CTime : "//span",
 		}
 	}
 	return &MainRule{}

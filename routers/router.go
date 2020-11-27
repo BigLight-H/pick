@@ -12,5 +12,5 @@ func init()  {
 }
 
 func init() {
-    beego.Router("/", &controllers.PickController{})
+    beego.Router("/", &controllers.PickController{},"post:Get")
 }

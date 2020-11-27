@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gocolly/colly"
 	"pick/conf"
 	"pick/util"
@@ -11,9 +12,9 @@ func BookInfo(role *conf.MainRule, domin string) ([]map[string]string, []map[str
 	//新建目录,没有就新建->返回目录名
 	dir := util.ThisMkdir(domin)
 	//图书信息
-	bookInfo := []map[string]string{}
+	var bookInfo []map[string]string
 	//章节信息
-	chapterInfo := []map[string]string{}
+	var chapterInfo []map[string]string
 	//图片信息
 	c := colly.NewCollector()
 	// Find and visit all links
@@ -24,11 +25,19 @@ func BookInfo(role *conf.MainRule, domin string) ([]map[string]string, []map[str
 		//util.MKdirs(dir+"\\"+title)
 		//章节链接
 		link := e.ChildText(role.Title)
-		img := GetDetail(role, link, dir+"\\"+title)
-		chapterInfo = append(
-			chapterInfo,
-			map[string]string{"link": link, "title": title, "imgs": img})
-
+		//链接redis
+		redisPool := ConnectRedis()
+		defer redisPool.Close()
+		isExist, _ := redisPool.Do("HEXISTS", "chapter_link", link)
+		//章节链接不存在redis里面采集
+		if isExist != 1 {
+			//章节更新时间
+			ctime := e.ChildText(role.CTime)
+			img := GetDetail(role, link, dir+"\\"+title)
+			chapterInfo = append(
+				chapterInfo,
+				map[string]string{"link": link, "title": title, "imgs": img, "ctime":ctime})
+		}
 	})
 	c.OnXML(role.Body, func(e *colly.XMLElement) {
 		//图书名
@@ -49,10 +58,12 @@ func BookInfo(role *conf.MainRule, domin string) ([]map[string]string, []map[str
 		types := e.ChildText(role.Types)
 		//图书封面
 		image := e.ChildText(role.Image)
+		//最后更新时间
+		ltime := e.ChildText(role.LTime)
 
 		bookInfo = append(
 			bookInfo,
-			map[string]string{"name": name, "year": year, "star": star, "author": author, "status": status, "intro": intro, "types": types, "tags": tags, "image": image})
+			map[string]string{"name": name, "year": year, "star": star, "author": author, "status": status, "intro": intro, "types": types, "tags": tags, "image": image, "ltime":ltime})
 	})
 	c.Visit(domin)
 	return bookInfo, chapterInfo
@@ -71,6 +82,15 @@ func GetDetail(role *conf.MainRule, domin string, file_name string) string {
 		img += imgLink+","
 	})
 	cs.Visit(domin)
+	if img != "" {
+		//存储章节爬取记录
+		redisPool := ConnectRedis()
+		defer redisPool.Close()
+		_, err := redisPool.Do("HSET", "chapter_link", domin, 1)
+		if err != nil {
+			spew.Dump("存入章节链接到redis错误")
+		}
+	}
 	return  img
 }
 

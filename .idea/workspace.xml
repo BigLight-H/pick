@@ -54,6 +54,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="740" y="274" key="FileChooserDialogImpl/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1606275330968" />
+    <state x="540" y="262" key="IDE.errors.dialog" timestamp="1606472938336">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="540" y="262" key="IDE.errors.dialog/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1606472938336" />
     <state x="461" y="164" key="SettingsEditor" timestamp="1606276540253">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -62,5 +66,13 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="771" y="208" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1606293891379" />
+    <state x="661" y="118" width="598" height="804" key="find.popup" timestamp="1606394748666">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="661" y="118" width="598" height="804" key="find.popup/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1606394748666" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1606458595649">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1606458595649" />
   </component>
 </project>

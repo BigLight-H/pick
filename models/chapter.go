@@ -1,10 +1,12 @@
 package models
 
 type Chapter struct {
-	Id        int
+	Id           int
 	ChapterName  string
-	BookId    int
-	ChapterOrder  string
+	BookId       int
+	ChapterOrder string
+	ChapterLink  string
+	LastTime     string
 }
 
 func (m *Chapter) TableName() string {
