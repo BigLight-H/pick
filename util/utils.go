@@ -4,10 +4,15 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
+	"github.com/davecgh/go-spew/spew"
+	"github.com/garyburd/redigo/redis"
+	"github.com/gocolly/colly"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"pick/models"
+	"pick/service"
+	"strconv"
 	"strings"
 )
 
@@ -126,6 +131,74 @@ func SplitArray(arr []string, num int) ([][]string) {
 	return segmens
 }
 
+func BookLists(domain string) {
+	//图片信息
+	c := colly.NewCollector()
 
+	// Find and visit all links
+	c.OnXML("//body/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/div[2]/div[1]/a[@class='last']", func(e *colly.XMLElement) {
+		lastLink := e.ChildText("//@href")
+		allPage := ChapterOrder(lastLink, "/", 2)
+		allNum, _ := strconv.Atoi(allPage)
+		for i := 1; i <= allNum; i++ {
+			//获取分页数据并存入数据库
+			pageDomain := domain + "page/" + strconv.Itoa(i) + "/"
+			GetLinks(pageDomain)
+		}
+	})
+	c.Visit(domain)
+}
+
+
+func GetLinks(pageDomain string) {
+	d := colly.NewCollector()
+	d.OnXML("//body/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/div[1]/div", func(f *colly.XMLElement) {
+		for a := 1; a <= 2; a++ {
+			//链接redis
+			redisPool := service.ConnectRedis()
+			defer redisPool.Close()
+			link := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[1]/a/@href")
+			title := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[1]/a/@title")
+			lastCharpter := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[2]/div[3]/div[1]/span[1]")
+			spew.Dump(lastCharpter)
+			isExist, _ := redisPool.Do("HEXISTS", "book_all_lists", link)
+			if isExist != int64(1) {
+				o := orm.NewOrm()
+				lists := models.Links{}
+				lists.BookLink = link
+				lists.BookName = title
+				lists.LastChapter = lastCharpter
+				lists.Status = 1
+				lid, err := o.Insert(&lists)
+				if err == nil {
+					_, err := redisPool.Do("HSET", "book_all_lists", link, lid)
+					if err != nil {
+						spew.Dump("漫画链接存入错误")
+					}
+				}
+			} else {
+				lid, err := redisPool.Do("HGET", "book_all_lists", link)
+				lId, _ := redis.Int(lid, err)
+				//查看更新
+				o := orm.NewOrm()
+				lists := models.Links{Id:lId}
+				lists.LastChapter = lastCharpter
+				if num, err := o.Update(&lists, "LastChapter"); err == nil {
+					//有更新改变字段值
+					if num > 0 {
+						u := orm.NewOrm()
+						up := models.Links{Id:lId}
+						up.Status = 1
+						if num, err := u.Update(&lists, "Status"); err == nil {
+							spew.Dump(num)
+						}
+					}
+				}
+			}
+		}
+		//os.Exit(2)
+	})
+	d.Visit(pageDomain)
+}
 
 
