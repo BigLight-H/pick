@@ -21,6 +21,7 @@ func Init() {
 		new(Book),
 		new(Chapter),
 		new(Photo),
+		new(Links),
 	)
 }
 

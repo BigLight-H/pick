@@ -1,10 +1,12 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/davecgh/go-spew/spew"
-	"math"
+	"github.com/garyburd/redigo/redis"
+	"github.com/gocolly/colly"
 	"pick/conf"
 	"pick/models"
 	"pick/service"
@@ -24,7 +26,72 @@ type Json struct {
 	Status int
 }
 
-func (p * PickController) Get() {
+func (p *PickController) Lists() {
+	domain := "https://www.webtoon.xyz/webtoons/"
+	//图片信息
+	c := colly.NewCollector()
+	d := c.Clone()
+	// Find and visit all links
+	c.OnXML("//body/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/div[2]/div[1]/a[@class='last']", func(e *colly.XMLElement) {
+		lastLink := e.ChildText("//@href")
+		allPage := util.ChapterOrder(lastLink, "/", 2)
+		allNum, _ := strconv.Atoi(allPage)
+		for i := 1; i <= allNum; i++ {
+			//获取分页数据并存入数据库
+			pageDomain := domain+"/page/"+strconv.Itoa(i)+"/"
+			d.OnXML("//body/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/div[1]/div", func(f *colly.XMLElement) {
+				for a := 1; a <= 2; a++ {
+					//链接redis
+					redisPool := service.ConnectRedis()
+					defer redisPool.Close()
+					link := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[1]/a/@href")
+					title := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[1]/a/@title")
+					lastCharpter := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[2]/div[3]/div[1]/span[1]")
+					//spew.Dump(lastCharpter)
+					isExist, _ := redisPool.Do("HEXISTS", "book_all_lists", link)
+					if isExist != int64(1) {
+						o := orm.NewOrm()
+						lists := models.Links{}
+						lists.BookLink = link
+						lists.BookName = title
+						lists.LastChapter = lastCharpter
+						lists.Status = 1
+						lid, err := o.Insert(&lists)
+						if err == nil {
+							_, err := redisPool.Do("HSET", "book_all_lists", link, lid)
+							if err != nil {
+								spew.Dump("漫画链接存入错误")
+							}
+						}
+					} else {
+						lid, err := redisPool.Do("HGET", "book_all_lists", link)
+						lId, _ := redis.Int(lid, err)
+						//查看更新
+						o := orm.NewOrm()
+						lists := models.Links{Id:lId}
+						lists.LastChapter = lastCharpter
+						if num, err := o.Update(&lists, "LastChapter"); err == nil {
+							//有更新改变字段值
+							if num > 0 {
+								u := orm.NewOrm()
+								up := models.Links{Id:lId}
+								up.Status = 1
+								if num, err := u.Update(&lists, "Status"); err == nil {
+									spew.Dump(num)
+								}
+							}
+						}
+					}
+				}
+			})
+			d.Visit(pageDomain)
+		}
+	})
+	c.Visit(domain)
+	p.MsgBack("采集全部图书链接完成", 1)
+}
+
+func (p * PickController) Collection() {
 	//源ID
 	rootId, _ := strconv.Atoi(p.GetString("id"))
 	//图书列表
@@ -34,21 +101,21 @@ func (p * PickController) Get() {
 		return
 	}
 	list := strings.Split(rootList, " ")
-	all := int(len(list))
-	if all > 5 {
-		a := float64(all / 10)
-		num := int(math.Floor(a + 0/5))
-		listArr := util.SplitArray(list, num)
-		for _, val := range listArr {
-			var wg sync.WaitGroup
-			for _, value := range val {
-				wg.Add(1)
-				go Comics(value, rootId)
-				wg.Done()
-			}
-			wg.Wait()
-		}
-	} else {
+	//all := int(len(list))
+	//if all > 5 {
+	//	a := float64(all / 10)
+	//	num := int(math.Floor(a + 0/5))
+	//	listArr := util.SplitArray(list, num)
+	//	for _, val := range listArr {
+	//		var wg sync.WaitGroup
+	//		for _, value := range val {
+	//			wg.Add(1)
+	//			go Comics(value, rootId)
+	//			wg.Done()
+	//		}
+	//		wg.Wait()
+	//	}
+	//} else {
 		var wg sync.WaitGroup
 		for _, val := range list {
 			//创建协程
@@ -57,7 +124,7 @@ func (p * PickController) Get() {
 			wg.Done()
 		}
 		wg.Wait()
-	}
+	//}
 
 	p.MsgBack("采集资源完成", 1)
 }
@@ -88,7 +155,7 @@ func Comics(domin string, rootId int) {
 		redisPool := service.ConnectRedis()
 		defer redisPool.Close()
 		isExist, _ := redisPool.Do("HEXISTS", "comic_link", domin)
-		if isExist != 1 {
+		if isExist != int64(1) {
 			//下载封面图片
 			util.DownloadJpg(v["image"], dir+"\\thumb.jpg")
 			//存入数据库
@@ -118,8 +185,16 @@ func Comics(domin string, rootId int) {
 				spew.Dump("漫画ID存入错误")
 			}
 		} else {
-			comicId, _ := redisPool.Do("HGET", "comic_link", domin)
-			bId = comicId.(int)
+			comicId, err := redisPool.Do("HGET", "comic_link", domin)
+			bookId, _ := redis.Int(comicId, err)
+			bId = bookId
+			//修改书本最新更新时间
+			b := orm.NewOrm()
+			oldBook := models.Book{Id: bId}
+			oldBook.LastTime = v["ltime"]
+			if num, err := b.Update(&oldBook, "LastTime"); err != nil {
+				fmt.Println(num)
+			}
 		}
 	}
 	for _, s := range chapterInfo {
@@ -133,17 +208,32 @@ func Comics(domin string, rootId int) {
 		chapter.ChapterOrder = util.ChapterOrder(son, "-", 1)
 		chapter.ChapterLink = s["link"]
 		chapter.LastTime = s["ctime"]
-		cId, _ := c.Insert(&chapter)
-		//if err != nil {
-		//	os.Exit(2)
-		//}
+		//cId, _ := c.Insert(&chapter)
+		cId := 0
+
+		// 三个返回参数依次为：是否新创建的，对象 Id 值，错误
+		if created, cid, err := c.ReadOrCreate(&chapter, "ChapterLink"); err == nil {
+			if created {
+				cId = int(cid)
+			} else {
+				cId = int(cid)
+				//修改章节最后更新时间
+				up := orm.NewOrm()
+				oldChapter := models.Chapter{Id: cId}
+				oldChapter.LastTime = s["ctime"]
+				if num, err := up.Update(&oldChapter, "LastTime"); err != nil {
+					fmt.Println(num)
+				}
+			}
+		}
+
 		//创建章节目录
 		util.MKdirs(dir + "\\" + son)
-		//创建协程
-		//for i := 0; i <= 4; i++ {
-		//创建协程处理
-		util.DoWork(dir+"\\"+son, s["imgs"], bId, int(cId))
-		//}
+
+		if cId > 0 {
+			go util.DoWork(dir+"\\"+son, s["imgs"], bId, cId)
+		}
+
 	}
 
 }

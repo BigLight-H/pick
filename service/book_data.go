@@ -30,9 +30,12 @@ func BookInfo(role *conf.MainRule, domin string) ([]map[string]string, []map[str
 		defer redisPool.Close()
 		isExist, _ := redisPool.Do("HEXISTS", "chapter_link", link)
 		//章节链接不存在redis里面采集
-		if isExist != 1 {
+		if isExist != int64(1) {
 			//章节更新时间
 			ctime := e.ChildText(role.CTime)
+			if ctime == "" {
+				ctime = e.ChildText(role.NCTime)
+			}
 			img := GetDetail(role, link, dir+"\\"+title)
 			chapterInfo = append(
 				chapterInfo,
@@ -60,7 +63,9 @@ func BookInfo(role *conf.MainRule, domin string) ([]map[string]string, []map[str
 		image := e.ChildText(role.Image)
 		//最后更新时间
 		ltime := e.ChildText(role.LTime)
-
+		if ltime == "" {
+			ltime = e.ChildText(role.NTime)
+		}
 		bookInfo = append(
 			bookInfo,
 			map[string]string{"name": name, "year": year, "star": star, "author": author, "status": status, "intro": intro, "types": types, "tags": tags, "image": image, "ltime":ltime})

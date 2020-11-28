@@ -100,11 +100,7 @@ func DoWork(dir string, imgs string, bid int, cid int) {
 				os.Exit(3)
 			}
 			//创建协程处理->获取图片并存储
-			//for i := 0; i <= 1; i++ {
 			DownloadJpg(value, dir+"\\"+name)
-			//	time.Sleep(1000)
-			//spew.Dump(value, dir+"\\"+name)
-			//}
 		}
 	}
 }
