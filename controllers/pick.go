@@ -94,7 +94,7 @@ func Comics(domin string, rootId int) {
 	bId := 0
 	for _, v := range bookInfo {
 		//链接redis
-		redisPool := service.ConnectRedis()
+		redisPool := models.ConnectRedis()
 		defer redisPool.Close()
 		isExist, _ := redisPool.Do("HEXISTS", "comic_link", domin)
 		if isExist != int64(1) {

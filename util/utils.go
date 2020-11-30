@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"os"
 	"pick/models"
-	"pick/service"
 	"strconv"
 	"strings"
 )
@@ -155,12 +154,12 @@ func GetLinks(pageDomain string) {
 	d.OnXML("//body/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/div[1]/div", func(f *colly.XMLElement) {
 		for a := 1; a <= 2; a++ {
 			//链接redis
-			redisPool := service.ConnectRedis()
+			redisPool := models.ConnectRedis()
 			defer redisPool.Close()
 			link := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[1]/a/@href")
 			title := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[1]/a/@title")
 			lastCharpter := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[2]/div[3]/div[1]/span[1]")
-			spew.Dump(lastCharpter)
+
 			isExist, _ := redisPool.Do("HEXISTS", "book_all_lists", link)
 			if isExist != int64(1) {
 				o := orm.NewOrm()

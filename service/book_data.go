@@ -4,6 +4,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gocolly/colly"
 	"pick/conf"
+	"pick/models"
 	"pick/util"
 )
 
@@ -18,6 +19,9 @@ func BookInfo(role *conf.MainRule, domin string) ([]map[string]string, []map[str
 	//图片信息
 	c := colly.NewCollector()
 	// Find and visit all links
+	//链接redis
+	redisPool := models.ConnectRedis()
+	defer redisPool.Close()
 	c.OnXML(role.Table, func(e *colly.XMLElement) {
 		//章节名
 		title := e.ChildText(role.Link)
@@ -25,9 +29,7 @@ func BookInfo(role *conf.MainRule, domin string) ([]map[string]string, []map[str
 		//util.MKdirs(dir+"\\"+title)
 		//章节链接
 		link := e.ChildText(role.Title)
-		//链接redis
-		redisPool := ConnectRedis()
-		defer redisPool.Close()
+
 		isExist, _ := redisPool.Do("HEXISTS", "chapter_link", link)
 		//章节链接不存在redis里面采集
 		if isExist != int64(1) {
@@ -89,7 +91,7 @@ func GetDetail(role *conf.MainRule, domin string, file_name string) string {
 	cs.Visit(domin)
 	if img != "" {
 		//存储章节爬取记录
-		redisPool := ConnectRedis()
+		redisPool := models.ConnectRedis()
 		defer redisPool.Close()
 		_, err := redisPool.Do("HSET", "chapter_link", domin, 1)
 		if err != nil {

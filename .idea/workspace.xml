@@ -1,7 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </select>
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="3dbb7ccb-ebd1-439d-bfbd-6247ef9ab6ae" name="Default Changelist" comment="" />
+    <list default="true" id="3dbb7ccb-ebd1-439d-bfbd-6247ef9ab6ae" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/pick.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/pick.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pick.exe" beforeDir="false" afterPath="$PROJECT_DIR$/pick.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/book_data.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/book_data.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/book_hub_source.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/book_source.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/connect_redis.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/xmlelement.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/utils.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/utils.go" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -41,7 +75,7 @@
     <property name="configurable.Project.GOPATH.is.expanded" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/static/css/fonts" />
-    <property name="settings.editor.selected.configurable" value="terminal" />
+    <property name="settings.editor.selected.configurable" value="vcs.Git" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
@@ -57,6 +91,17 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="WindowStateProjectService">
     <state x="752" y="178" key="#GOPATH" timestamp="1606275332889">
@@ -75,10 +120,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="540" y="262" key="IDE.errors.dialog/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1606472938336" />
-    <state x="461" y="164" key="SettingsEditor" timestamp="1606276540253">
+    <state x="461" y="164" key="SettingsEditor" timestamp="1606729919615">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="461" y="164" key="SettingsEditor/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1606276540253" />
+    <state x="461" y="164" key="SettingsEditor/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1606729919615" />
     <state x="92" y="92" width="1736" height="856" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1606535757000">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -91,10 +136,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="661" y="118" width="598" height="804" key="find.popup/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1606394748666" />
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1606557803253">
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1606657463533">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1606557803253" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1606657463533" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -102,8 +147,12 @@
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/views/common.vue</url>
           <line>16</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/models/redis.go</url>
+          <line>4</line>
+          <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
