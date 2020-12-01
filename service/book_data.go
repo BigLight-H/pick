@@ -5,13 +5,10 @@ import (
 	"github.com/gocolly/colly"
 	"pick/conf"
 	"pick/models"
-	"pick/util"
 )
 
 //书目录
 func BookInfo(role *conf.MainRule, domin string) ([]map[string]string, []map[string]string) {
-	//新建目录,没有就新建->返回目录名
-	dir := util.ThisMkdir(domin)
 	//图书信息
 	var bookInfo []map[string]string
 	//章节信息
@@ -29,8 +26,7 @@ func BookInfo(role *conf.MainRule, domin string) ([]map[string]string, []map[str
 		//util.MKdirs(dir+"\\"+title)
 		//章节链接
 		link := e.ChildText(role.Title)
-
-		isExist, _ := redisPool.Do("HEXISTS", "chapter_link", link)
+		isExist, _ := redisPool.Do("HEXISTS", "chapter_links", link)
 		//章节链接不存在redis里面采集
 		if isExist != int64(1) {
 			//章节更新时间
@@ -38,7 +34,7 @@ func BookInfo(role *conf.MainRule, domin string) ([]map[string]string, []map[str
 			if ctime == "" {
 				ctime = e.ChildText(role.NCTime)
 			}
-			img := GetDetail(role, link, dir+"\\"+title)
+			img := GetDetail(role, link)
 			chapterInfo = append(
 				chapterInfo,
 				map[string]string{"link": link, "title": title, "imgs": img, "ctime":ctime})
@@ -76,7 +72,7 @@ func BookInfo(role *conf.MainRule, domin string) ([]map[string]string, []map[str
 	return bookInfo, chapterInfo
 }
 
-func GetDetail(role *conf.MainRule, domin string, file_name string) string {
+func GetDetail(role *conf.MainRule, domin string) string {
 	cs := colly.NewCollector()
 	var img string
 	cs.OnXML(role.Detail, func(e *colly.XMLElement) {
@@ -93,7 +89,7 @@ func GetDetail(role *conf.MainRule, domin string, file_name string) string {
 		//存储章节爬取记录
 		redisPool := models.ConnectRedis()
 		defer redisPool.Close()
-		_, err := redisPool.Do("HSET", "chapter_link", domin, 1)
+		_, err := redisPool.Do("HSET", "chapter_links", domin, 1)
 		if err != nil {
 			spew.Dump("存入章节链接到redis错误")
 		}

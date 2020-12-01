@@ -26,14 +26,13 @@
   <component name="ChangeListManager">
     <list default="true" id="3dbb7ccb-ebd1-439d-bfbd-6247ef9ab6ae" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/conf/app.conf" beforeDir="false" afterPath="$PROJECT_DIR$/conf/app.conf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controllers/pick.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/pick.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/base.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/base.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/book_episode.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/book_episode.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/book_list.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/book_list.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pick.exe" beforeDir="false" afterPath="$PROJECT_DIR$/pick.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/book_data.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/book_data.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/book_hub_source.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/book_source.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/connect_redis.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/test.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/xmlelement.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/util/utils.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/utils.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -102,6 +101,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
     <state x="752" y="178" key="#GOPATH" timestamp="1606275332889">
@@ -132,10 +132,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="771" y="208" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1606293891379" />
-    <state x="661" y="118" width="598" height="804" key="find.popup" timestamp="1606394748666">
+    <state x="661" y="118" width="598" height="804" key="find.popup" timestamp="1606740448914">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="661" y="118" width="598" height="804" key="find.popup/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1606394748666" />
+    <state x="661" y="118" width="598" height="804" key="find.popup/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1606740448914" />
     <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1606657463533">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

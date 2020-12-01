@@ -8,11 +8,13 @@ import (
 	"github.com/garyburd/redigo/redis"
 	"github.com/gocolly/colly"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"os"
 	"pick/models"
 	"strconv"
 	"strings"
+	"time"
 )
 
 //建立图书目录
@@ -41,10 +43,20 @@ func GetSubdirectory(domin string) (string, string)  {
 //获取章节排序
 func ChapterOrder(chapterName string, str string, k int) string  {
 	chapterArr := strings.Split(chapterName, str)
-	orderId := chapterArr[len(chapterArr)-k]
+	var orderId string
+	if len(chapterArr) > 2 {
+		orderId = chapterArr[len(chapterArr)-(k+1)]+"-"+chapterArr[len(chapterArr)-k]
+	} else {
+		orderId = chapterArr[len(chapterArr)-k]
+	}
 	return orderId
 }
 
+//计算图片张数
+func SumImgs(imgs string) (int, string)  {
+	chapterArr := strings.Split(imgs, ",")
+	return len(chapterArr), chapterArr[0]
+}
 
 //建立指定目录
 func MKdirs(path string) {
@@ -84,7 +96,7 @@ func HandError(err error)  {
 	}
 }
 
-func DoWork(dir string, imgs string, bid int, cid int) {
+func DoWork(dir string, imgs string, bid string, eid string) {
 	imgArr := strings.Split(imgs, ",")
 	//删除第最后一个元素
 	if len(imgArr) > 0 {
@@ -92,19 +104,19 @@ func DoWork(dir string, imgs string, bid int, cid int) {
 		for _, value := range imgArr{
 			imgAr := strings.Split(value, "/")
 			name := imgAr[len(imgAr)-1]
-			//存入图片表
-			c := orm.NewOrm()
-			photo := models.Photo{}
-			photo.ChapterId = cid
-			photo.BookId = bid
-			photo.PicOrder = ChapterOrder(name,".",2)
-			photo.ImgUrl = value
-			_, err := c.Insert(&photo)
-			if err != nil {
-				os.Exit(3)
-			}
+			////存入图片表
+			//c := orm.NewOrm()
+			//photo := models.Photo{}
+			//photo.ChapterId = cid
+			//photo.BookId = bid
+			//photo.PicOrder = ChapterOrder(name,".",2)
+			//photo.ImgUrl = value
+			//_, err := c.Insert(&photo)
+			//if err != nil {
+			//	os.Exit(3)
+			//}
 			//创建协程处理->获取图片并存储
-			DownloadJpg(value, dir+"\\"+name)
+			DownloadJpg(value, dir+"\\"+bid+"0"+eid+name)
 		}
 	}
 }
@@ -200,4 +212,13 @@ func GetLinks(pageDomain string) {
 	d.Visit(pageDomain)
 }
 
-
+// 随机数字串
+func RandomNum(length int) string {
+	result := ""
+	rand.Seed(time.Now().UnixNano())
+	for i := 0; i < length; i++ {
+		num := rand.Intn(10)
+		result = result + strconv.Itoa(num)
+	}
+	return result
+}
