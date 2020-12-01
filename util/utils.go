@@ -68,26 +68,27 @@ func MKdirs(path string) {
 
 func DownloadJpg(url string,file_name string)  {
 	client := &http.Client{}
+	if url != "" {
+		req,err := http.NewRequest("GET",url,nil)
+		if err != nil{
+			fmt.Println(err)
+		}
 
-	req,err := http.NewRequest("GET",url,nil)
-	if err != nil{
-		fmt.Println(err)
+		req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.108 Safari/537.2222")
+		req.Header.Add("Referer","https://www.webtoon.xyz/")
+		resp,err := client.Do(req)
+		// 先判断是否有错误
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer resp.Body.Close()
+
+		byteCotent, err := ioutil.ReadAll(resp.Body)
+		HandError(err)
+
+		ioutil.WriteFile(beego.AppConfig.String("comic_hub") + file_name, byteCotent, 0777)
+		spew.Dump("已下载图片链接"+url)
 	}
-
-	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.108 Safari/537.2222")
-	req.Header.Add("Referer","https://www.webtoon.xyz/")
-	resp,err := client.Do(req)
-	// 先判断是否有错误
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer resp.Body.Close()
-
-	byteCotent, err := ioutil.ReadAll(resp.Body)
-	HandError(err)
-
-	ioutil.WriteFile(beego.AppConfig.String("comic_hub") + file_name, byteCotent, 0777)
-
 }
 
 func HandError(err error)  {
@@ -104,19 +105,7 @@ func DoWork(dir string, imgs string, bid string, eid string) {
 		for _, value := range imgArr{
 			imgAr := strings.Split(value, "/")
 			name := imgAr[len(imgAr)-1]
-			////存入图片表
-			//c := orm.NewOrm()
-			//photo := models.Photo{}
-			//photo.ChapterId = cid
-			//photo.BookId = bid
-			//photo.PicOrder = ChapterOrder(name,".",2)
-			//photo.ImgUrl = value
-			//_, err := c.Insert(&photo)
-			//if err != nil {
-			//	os.Exit(3)
-			//}
-			//创建协程处理->获取图片并存储
-			DownloadJpg(value, dir+"\\"+bid+"0"+eid+name)
+			go DownloadJpg(value, dir+"\\"+bid+"0"+eid+name)
 		}
 	}
 }

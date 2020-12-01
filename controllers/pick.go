@@ -189,10 +189,7 @@ func Comics(domin string, rootId int) {
 					util.MKdirs(bookid + "\\" + epid)
 					//下载章节首张图片
 					util.DownloadJpg(fImg, imgRole)
-					//协程下载图片
-					if cId > 0 {
-						go util.DoWork(bookid+"\\"+epid, s["imgs"], bookid, epid)
-					}
+
 				}
 			} else {
 				cId = int(cid)
@@ -202,6 +199,13 @@ func Comics(domin string, rootId int) {
 				num, _ := c.Update(&oldChapter, "LastTime")
 				if num > int64(0) {
 					spew.Dump(num)
+				}
+			}
+
+			//协程下载图片
+			if cId > 0 {
+				if s["imgs"] != "" {
+					go util.DoWork(bookid+"\\"+epid, s["imgs"], bookid, epid)
 				}
 			}
 		}

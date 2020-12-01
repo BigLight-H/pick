@@ -26,13 +26,8 @@
   <component name="ChangeListManager">
     <list default="true" id="3dbb7ccb-ebd1-439d-bfbd-6247ef9ab6ae" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/conf/app.conf" beforeDir="false" afterPath="$PROJECT_DIR$/conf/app.conf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controllers/pick.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/pick.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/base.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/base.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/book_episode.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/book_episode.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/book_list.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/book_list.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pick.exe" beforeDir="false" afterPath="$PROJECT_DIR$/pick.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/book_data.go" beforeDir="false" afterPath="$PROJECT_DIR$/service/book_data.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/utils.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/utils.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
