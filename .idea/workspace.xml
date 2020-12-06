@@ -26,9 +26,6 @@
   <component name="ChangeListManager">
     <list default="true" id="3dbb7ccb-ebd1-439d-bfbd-6247ef9ab6ae" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/pick.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/pick.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pick.exe" beforeDir="false" afterPath="$PROJECT_DIR$/pick.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/utils.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/utils.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -131,10 +128,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="661" y="118" width="598" height="804" key="find.popup/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1606740448914" />
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1606657463533">
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1606867447796">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1606657463533" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1606867447796" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
