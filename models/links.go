@@ -5,6 +5,7 @@ type Links struct {
 	BookLink  string
 	BookName  string
 	LastChapter  string
+	Type  string
 	Status    int
 }
 
