@@ -135,7 +135,7 @@ func Comics(domin string, rootId int) {
 					//新建文件目录
 					util.MKdirs(bookid)
 					//下载封面图片到目录
-					util.DownloadJpg(v["image"], bookid+"\\"+bookid+"_thumb.jpg")
+					util.DownloadJpg(v["image"], bookid+"/"+bookid+"_thumb.jpg")
 				}
 			}
 			_, err := redisPool.Do("HSET", "comic_links", domin, bId)
@@ -180,13 +180,13 @@ func Comics(domin string, rootId int) {
 			if created {
 				cId = int(cid)
 				//图片路径
-				imgRole := bookid +"\\"+ epid +"\\"+ bookid +"0"+ epid +"_thumb.jpg"
+				imgRole := bookid +"/"+ epid +"/"+ bookid +"0"+ epid +"_thumb.jpg"
 				upimg := models.BookEpisode{Id: cId}
 				upimg.EpisodeThumbnail = bookid +"/"+ epid +"/"+ bookid +"0"+ epid +"_thumb.jpg"
 				num, _ := c.Update(&upimg, "EpisodeThumbnail")
 				if num > int64(0) {
 					//创建章节目录
-					util.MKdirs(bookid + "\\" + epid)
+					util.MKdirs(bookid + "/" + epid)
 					//下载章节首张图片
 					util.DownloadJpg(fImg, imgRole)
 
@@ -205,7 +205,7 @@ func Comics(domin string, rootId int) {
 			//协程下载图片
 			if cId > 0 {
 				if s["imgs"] != "" {
-					go util.DoWork(bookid+"\\"+epid, s["imgs"], bookid, epid)
+					go util.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid)
 				}
 			}
 		}

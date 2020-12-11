@@ -40,6 +40,14 @@ func GetSubdirectory(domin string) (string, string)  {
 	return fater, son
 }
 
+
+func ChapterListOrder(chapterName string, str string, k int) string  {
+	chapterArr := strings.Split(chapterName, str)
+	var orderId string
+	orderId = chapterArr[len(chapterArr)-k]
+	return orderId
+}
+
 //获取章节排序
 func ChapterOrder(chapterName string, str string, k int) string  {
 	chapterArr := strings.Split(chapterName, str)
@@ -105,7 +113,7 @@ func DoWork(dir string, imgs string, bid string, eid string) {
 		for _, value := range imgArr{
 			imgAr := strings.Split(value, "/")
 			name := imgAr[len(imgAr)-1]
-			go DownloadJpg(value, dir+"\\"+bid+"0"+eid+name)
+			go DownloadJpg(value, dir+"/"+bid+"0"+eid+name)
 		}
 	}
 }
@@ -138,7 +146,7 @@ func BookLists(domain string) {
 	// Find and visit all links
 	c.OnXML("//body/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/div[2]/div[1]/a[@class='last']", func(e *colly.XMLElement) {
 		lastLink := e.ChildText("//@href")
-		allPage := ChapterOrder(lastLink, "/", 2)
+		allPage := ChapterListOrder(lastLink, "/", 2)
 		allNum, _ := strconv.Atoi(allPage)
 		for i := 1; i <= allNum; i++ {
 			//获取分页数据并存入数据库
