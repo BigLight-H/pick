@@ -11,7 +11,9 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"pick/conf"
 	"pick/models"
+	"pick/service"
 	"strconv"
 	"strings"
 	"time"
@@ -74,8 +76,9 @@ func MKdirs(path string) {
 	}
 }
 
-func DownloadJpg(url string,file_name string)  {
-	client := &http.Client{}
+func DownloadJpg(url string, file_name string)  {
+	transport := &http.Transport{IdleConnTimeout: 0}
+	client := &http.Client{Transport: transport}
 	if url != "" {
 		req,err := http.NewRequest("GET",url,nil)
 		if err != nil{
@@ -84,15 +87,22 @@ func DownloadJpg(url string,file_name string)  {
 
 		req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.108 Safari/537.2222")
 		req.Header.Add("Referer","https://www.webtoon.xyz/")
-		resp,err := client.Do(req)
-		// 先判断是否有错误
-		if err != nil {
-			fmt.Println(err)
+
+		req.Close = true
+
+		resp, er := client.Do(req)
+
+		if er != nil {
+			fmt.Println(er)
+			return
 		}
 		defer resp.Body.Close()
-
-		byteCotent, err := ioutil.ReadAll(resp.Body)
-		HandError(err)
+		if resp.StatusCode != 200 {
+			fmt.Println(resp.StatusCode)
+			return
+		}
+		byteCotent, e := ioutil.ReadAll(resp.Body)
+		HandError(e)
 
 		ioutil.WriteFile(beego.AppConfig.String("comic_hub") + file_name, byteCotent, 0777)
 		spew.Dump("已下载图片链接"+url)
@@ -160,16 +170,20 @@ func BookLists(domain string) {
 
 func GetLinks(pageDomain string) {
 	d := colly.NewCollector()
+	//var wg sync.WaitGroup
 	d.OnXML("//body/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/div[1]/div", func(f *colly.XMLElement) {
 		for a := 1; a <= 2; a++ {
 			//链接redis
-			redisPool := models.ConnectRedis()
+			redisPool := models.ConnectRedisPool()
 			defer redisPool.Close()
 			link := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[1]/a/@href")
 			title := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[1]/a/@title")
 			lastCharpter := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[2]/div[3]/div[1]/span[1]")
 
 			isExist, _ := redisPool.Do("HEXISTS", "book_all_lists", link)
+			spew.Dump(link)
+			//创建协程
+			//wg.Add(1)
 			if isExist != int64(1) {
 				o := orm.NewOrm()
 				lists := models.Links{}
@@ -183,6 +197,8 @@ func GetLinks(pageDomain string) {
 					if err != nil {
 						spew.Dump("漫画链接存入错误")
 					}
+					go ComicsCopy(link, 1)
+					//wg.Done()
 				}
 			} else {
 				lid, err := redisPool.Do("HGET", "book_all_lists", link)
@@ -200,13 +216,17 @@ func GetLinks(pageDomain string) {
 						if num, err := u.Update(&lists, "Status"); err == nil {
 							spew.Dump(num)
 						}
+						go ComicsCopy(link, 1)
+						//wg.Done()
 					}
 				}
 			}
+
 		}
 		//os.Exit(2)
 	})
 	d.Visit(pageDomain)
+	//wg.Wait()
 }
 
 // 随机数字串
@@ -218,4 +238,132 @@ func RandomNum(length int) string {
 		result = result + strconv.Itoa(num)
 	}
 	return result
+}
+
+//操作图书
+func ComicsCopy(domin string, rootId int) {
+	//获取指定规则
+	role := conf.Choose(rootId)
+	//爬取图书
+	bookInfo, chapterInfo := service.BookInfo(role, domin)
+	//图书ID
+	bId := 0
+	o := orm.NewOrm()
+	for _, v := range bookInfo {
+		//链接redis
+		redisPool := models.ConnectRedisPool()
+		defer redisPool.Close()
+		isExist, _ := redisPool.Do("HEXISTS", "comic_links", domin)
+		if isExist != int64(1) {
+			//存入数据库
+			book := models.BookList{}
+			book.DomainName = domin
+			book.BookTitle = v["name"]
+			book.BookTags = v["tags"]
+			book.BookProfile = v["intro"]
+			book.BookStat = 0
+			if v["status"] == "Completed" {
+				book.BookStat = 1
+			}
+			book.BookAuthor = v["author"]
+			//book.CoverUrl = v["image"]
+			book.NowStatus = v["types"]
+			book.Star = v["star"]
+			book.Year = v["year"]
+			book.LastTime = v["ltime"]
+			book.TimesCollect = RandomNum(4)
+			book.TimesBuy = RandomNum(4)
+			book.TimesRead = RandomNum(4)
+			book.TimesSubscribed = RandomNum(4)
+			book.UserBuy = RandomNum(4)
+			book.BookThumbnail = ""
+			book.IsAgeLimit = 1
+			id, _ := o.Insert(&book)
+			bId = int(id)
+			if id > int64(0) {
+				up := models.BookList{BookId: bId}
+				bookid := strconv.Itoa(bId)
+				up.BookThumbnail = bookid+"/"+bookid+"_thumb.jpg"
+				num, _ := o.Update(&up, "BookThumbnail")
+				if num > int64(0) {
+					//新建文件目录
+					MKdirs(bookid)
+					//下载封面图片到目录
+					DownloadJpg(v["image"], bookid+"/"+bookid+"_thumb.jpg")
+				}
+			}
+			_, err := redisPool.Do("HSET", "comic_links", domin, bId)
+			if err != nil {
+				spew.Dump("漫画ID存入错误")
+			}
+		} else {
+			comicId, err := redisPool.Do("HGET", "comic_links", domin)
+			bookId, _ := redis.Int(comicId, err)
+			bId = bookId
+			//修改书本最新更新时间
+
+			oldBook := models.BookList{BookId: bId}
+			oldBook.LastTime = v["ltime"]
+			if num, err := o.Update(&oldBook, "LastTime"); err != nil {
+				fmt.Println(num)
+			}
+		}
+	}
+	bookid := strconv.Itoa(bId)
+	for _, s := range chapterInfo {
+		//切割链接
+		_, son := GetSubdirectory(s["link"])
+		epid := ChapterOrder(son, "-", 1)
+		//存入章节表
+		c := orm.NewOrm()
+		chapter := models.BookEpisode{}
+		chapter.BookId = bId
+		chapter.EpisodeTitle = s["title"]
+		chapter.EpisodeId = epid
+		imgLen, fImg := SumImgs(s["imgs"])
+		chapter.EpisodeImgtotal = imgLen
+		chapter.EpisodeThumbnail = ""
+		chapter.LastTime = s["ctime"]
+		chapter.Link = s["link"]
+		//cId, _ := c.Insert(&chapter)
+		cId := 0
+
+		// 三个返回参数依次为：是否新创建的，对象 Id 值，错误
+		if created, cid, err := c.ReadOrCreate(&chapter, "Link"); err == nil {
+			if created {
+				cId = int(cid)
+				//图片路径
+				imgRole := bookid +"/"+ epid +"/"+ bookid +"0"+ epid +"_thumb.jpg"
+				upimg := models.BookEpisode{Id: cId}
+				upimg.EpisodeThumbnail = bookid +"/"+ epid +"/"+ bookid +"0"+ epid +"_thumb.jpg"
+				num, _ := c.Update(&upimg, "EpisodeThumbnail")
+				if num > int64(0) {
+					//创建章节目录
+					MKdirs(bookid + "/" + epid)
+					//下载章节首张图片
+					DownloadJpg(fImg, imgRole)
+
+				}
+			} else {
+				cId = int(cid)
+				//修改章节最后更新时间
+				oldChapter := models.BookEpisode{Id: cId}
+				oldChapter.LastTime = s["ctime"]
+				num, _ := c.Update(&oldChapter, "LastTime")
+				if num > int64(0) {
+					spew.Dump(num)
+				}
+			}
+
+			//协程下载图片
+			if cId > 0 {
+				if s["imgs"] != "" {
+					go DoWork(bookid+"/"+epid, s["imgs"], bookid, epid)
+				}
+			}
+		}
+
+
+	}
+
 }

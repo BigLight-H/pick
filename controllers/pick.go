@@ -47,7 +47,8 @@ func (p * PickController) Collection() {
 		p.Ctx.WriteString("rootList is empty")
 		return
 	}
-	list := strings.Split(rootList, " ")
+	list := strings.Split(rootList, "\n")
+	spew.Dump(list)
 	//all := int(len(list))
 	//if all > 5 {
 	//	a := float64(all / 10)
@@ -97,7 +98,7 @@ func Comics(domin string, rootId int) {
 	o := orm.NewOrm()
 	for _, v := range bookInfo {
 		//链接redis
-		redisPool := models.ConnectRedis()
+		redisPool := models.ConnectRedisPool()
 		defer redisPool.Close()
 		isExist, _ := redisPool.Do("HEXISTS", "comic_links", domin)
 		if isExist != int64(1) {
@@ -156,7 +157,6 @@ func Comics(domin string, rootId int) {
 		}
 	}
 	bookid := strconv.Itoa(bId)
-	spew.Dump(bookid)
 	for _, s := range chapterInfo {
 		//切割链接
 		_, son := util.GetSubdirectory(s["link"])

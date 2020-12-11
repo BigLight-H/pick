@@ -17,7 +17,7 @@ func BookInfo(role *conf.MainRule, domin string) ([]map[string]string, []map[str
 	c := colly.NewCollector()
 	// Find and visit all links
 	//链接redis
-	redisPool := models.ConnectRedis()
+	redisPool := models.ConnectRedisPool()
 	defer redisPool.Close()
 	c.OnXML(role.Table, func(e *colly.XMLElement) {
 		//章节名
@@ -87,7 +87,7 @@ func GetDetail(role *conf.MainRule, domin string) string {
 	cs.Visit(domin)
 	if img != "" {
 		//存储章节爬取记录
-		redisPool := models.ConnectRedis()
+		redisPool := models.ConnectRedisPool()
 		defer redisPool.Close()
 		_, err := redisPool.Do("HSET", "chapter_links", domin, 1)
 		if err != nil {
