@@ -214,6 +214,7 @@ func Comics(domin string, rootId int) {
 			//}
 		}
 		if s["imgs"] != "" {
+			spew.Dump(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"])
 			go util.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"])
 		}
 
