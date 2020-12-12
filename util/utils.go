@@ -131,6 +131,8 @@ func HandError(err error)  {
 
 func DoWork(dir string, imgs string, bid string, eid string, link string) {
 	imgArr := strings.Split(imgs, ",")
+	spew.Dump(imgArr)
+	os.Exit(2)
 	//删除第最后一个元素
 	if len(imgArr) > 0 {
 		imgArr = imgArr[:len(imgArr)-1]
