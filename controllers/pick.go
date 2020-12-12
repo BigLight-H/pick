@@ -68,6 +68,7 @@ func (p * PickController) Collection() {
 		for _, val := range list {
 			//创建协程
 			wg.Add(1)
+			spew.Dump(val)
 			go Comics(val, rootId)
 			wg.Done()
 		}
