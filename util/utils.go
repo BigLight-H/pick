@@ -155,15 +155,14 @@ func BookLists(domain string) {
 
 	// Find and visit all links
 	c.OnXML("//body/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/div[2]/div[1]/a[@class='last']", func(e *colly.XMLElement) {
-		//lastLink := e.ChildText("//@href")
-		//allPage := ChapterListOrder(lastLink, "/", 2)
-		//allNum, _ := strconv.Atoi(allPage)
-		//for i := 1; i <= allNum; i++ {
+		lastLink := e.ChildText("//@href")
+		allPage := ChapterListOrder(lastLink, "/", 2)
+		allNum, _ := strconv.Atoi(allPage)
+		for i := 1; i <= allNum; i++ {
 			//获取分页数据并存入数据库
-			//pageDomain := domain + "page/" + strconv.Itoa(i) + "/"
-			pageDomain := domain + "page/2/"
+			pageDomain := domain + "page/" + strconv.Itoa(i) + "/"
 			GetLinks(pageDomain)
-		//}
+		}
 	})
 	c.Visit(domain)
 }
