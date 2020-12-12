@@ -38,6 +38,14 @@ func BookInfo(role *conf.MainRule, domin string) ([]map[string]string, []map[str
 				chapterInfo,
 				map[string]string{"link": link, "title": title, "imgs": img, "ctime":ctime})
 		}
+		ctime := e.ChildText(role.CTime)
+		if ctime == "" {
+			ctime = e.ChildText(role.NCTime)
+		}
+		img := GetDetail(role, link)
+		chapterInfo = append(
+			chapterInfo,
+			map[string]string{"link": link, "title": title, "imgs": img, "ctime":ctime})
 	})
 	c.OnXML(role.Body, func(e *colly.XMLElement) {
 		//图书名
