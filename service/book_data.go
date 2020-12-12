@@ -1,7 +1,6 @@
 package service
 
 import (
-	"github.com/davecgh/go-spew/spew"
 	"github.com/gocolly/colly"
 	"pick/conf"
 	"pick/models"
@@ -39,14 +38,6 @@ func BookInfo(role *conf.MainRule, domin string) ([]map[string]string, []map[str
 				chapterInfo,
 				map[string]string{"link": link, "title": title, "imgs": img, "ctime":ctime})
 		}
-		ctime := e.ChildText(role.CTime)
-		if ctime == "" {
-			ctime = e.ChildText(role.NCTime)
-		}
-		img := GetDetail(role, link)
-		chapterInfo = append(
-			chapterInfo,
-			map[string]string{"link": link, "title": title, "imgs": img, "ctime":ctime})
 	})
 	c.OnXML(role.Body, func(e *colly.XMLElement) {
 		//图书名
@@ -93,15 +84,6 @@ func GetDetail(role *conf.MainRule, domin string) string {
 		img += imgLink+","
 	})
 	cs.Visit(domin)
-	if img != "" {
-		//存储章节爬取记录
-		redisPool := models.ConnectRedisPool()
-		defer redisPool.Close()
-		_, err := redisPool.Do("HSET", "chapter_links", domin, 1)
-		if err != nil {
-			spew.Dump("存入章节链接到redis错误")
-		}
-	}
 	return  img
 }
 

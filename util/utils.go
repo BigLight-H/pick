@@ -83,6 +83,7 @@ func DownloadJpg(url string, file_name string)  {
 		req,err := http.NewRequest("GET",url,nil)
 		if err != nil{
 			fmt.Println(err)
+			return
 		}
 
 		req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.108 Safari/537.2222")
@@ -94,6 +95,7 @@ func DownloadJpg(url string, file_name string)  {
 
 		if er != nil {
 			fmt.Println(er)
+			defer resp.Body.Close()
 			return
 		}
 		defer resp.Body.Close()
@@ -115,7 +117,7 @@ func HandError(err error)  {
 	}
 }
 
-func DoWork(dir string, imgs string, bid string, eid string) {
+func DoWork(dir string, imgs string, bid string, eid string, link string) {
 	imgArr := strings.Split(imgs, ",")
 	//删除第最后一个元素
 	if len(imgArr) > 0 {
@@ -124,6 +126,13 @@ func DoWork(dir string, imgs string, bid string, eid string) {
 			imgAr := strings.Split(value, "/")
 			name := imgAr[len(imgAr)-1]
 			go DownloadJpg(value, dir+"/"+bid+"0"+eid+name)
+		}
+		//存储章节爬取记录
+		redisPool := models.ConnectRedisPool()
+		defer redisPool.Close()
+		_, err := redisPool.Do("HSET", "chapter_links", link, 1)
+		if err != nil {
+			spew.Dump("存入章节链接到redis错误")
 		}
 	}
 }
@@ -360,7 +369,7 @@ func ComicsCopy(domin string, rootId int) {
 			//协程下载图片
 			//if cId > 0 {
 				if s["imgs"] != "" {
-					go DoWork(bookid+"/"+epid, s["imgs"], bookid, epid)
+					go DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"])
 				}
 			//}
 		}
