@@ -78,6 +78,7 @@ func MKdirs(path string) {
 
 func DownloadJpg(url string, file_name string)  {
 	bs := Exists(beego.AppConfig.String("comic_hub") + file_name)
+	spew.Dump(beego.AppConfig.String("comic_hub") + file_name, bs)
 	if bs {
 		return
 	}
@@ -131,8 +132,6 @@ func HandError(err error)  {
 
 func DoWork(dir string, imgs string, bid string, eid string, link string) {
 	imgArr := strings.Split(imgs, ",")
-	spew.Dump(imgArr)
-	os.Exit(2)
 	//删除第最后一个元素
 	if len(imgArr) > 0 {
 		imgArr = imgArr[:len(imgArr)-1]
