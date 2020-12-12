@@ -230,14 +230,14 @@ func GetLinks(pageDomain string) {
 				lists := models.Links{Id:lId}
 				lists.LastChapter = lastCharpter
 				lists.Type = t1+","+t2
-				if num, err := o.Update(&lists, "LastChapter", "Type"); err == nil {
+				if num1, err1 := o.Update(&lists, "LastChapter", "Type"); err1 == nil {
 					//有更新改变字段值
-					if num > 0 {
+					if num1 > 0 {
 						u := orm.NewOrm()
 						up := models.Links{Id:lId}
 						up.Status = 1
-						if num, err := u.Update(&lists, "Status"); err == nil {
-							spew.Dump(num)
+						if num2, err2 := u.Update(&lists, "Status"); err2 == nil {
+							spew.Dump(num2)
 						}
 						//go ComicsCopy(link, 1)
 						//wg.Done()
