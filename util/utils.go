@@ -160,8 +160,7 @@ func BookLists(domain string) {
 		allNum, _ := strconv.Atoi(allPage)
 		for i := 1; i <= allNum; i++ {
 			//获取分页数据并存入数据库
-			pageDomain := domain + "page/" + strconv.Itoa(i) + "/"
-			GetLinks(pageDomain)
+			go GetLinks(domain + "page/" + strconv.Itoa(i) + "/")
 		}
 	})
 	c.Visit(domain)
