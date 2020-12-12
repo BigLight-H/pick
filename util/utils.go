@@ -248,8 +248,6 @@ func ComicsCopy(domin string, rootId int) {
 	role := conf.Choose(rootId)
 	//爬取图书
 	bookInfo, chapterInfo := service.BookInfo(role, domin)
-	spew.Dump(chapterInfo)
-	os.Exit(2)
 	//图书ID
 	bId := 0
 	o := orm.NewOrm()
