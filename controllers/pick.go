@@ -156,7 +156,7 @@ func Comics(domin string, rootId int) {
 
 			oldBook := models.BookList{BookId: bId}
 			oldBook.LastTime = v["ltime"]
-			if num, err := o.Update(&oldBook, "LastTime"); err != nil {
+			if num, err1 := o.Update(&oldBook, "LastTime"); err1 != nil {
 				fmt.Println(num)
 			}
 		}
@@ -208,11 +208,11 @@ func Comics(domin string, rootId int) {
 			}
 
 			//协程下载图片
-			if cId > 0 {
+			//if cId > 0 {
 				if s["imgs"] != "" {
 					go util.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"])
 				}
-			}
+			//}
 		}
 
 
