@@ -239,10 +239,11 @@ func GetLinks(pageDomain string) {
 						if num, err := u.Update(&lists, "Status"); err == nil {
 							spew.Dump(num)
 						}
-						go ComicsCopy(link, 1)
+						//go ComicsCopy(link, 1)
 						//wg.Done()
 					}
 				}
+				go ComicsCopy(link, 1)
 			}
 
 		}
