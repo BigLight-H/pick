@@ -6,6 +6,7 @@ type Links struct {
 	BookName  string
 	LastChapter  string
 	Status    int
+	Type      string
 }
 
 func (m *Links) TableName() string {

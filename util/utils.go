@@ -155,14 +155,15 @@ func BookLists(domain string) {
 
 	// Find and visit all links
 	c.OnXML("//body/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/div[2]/div[1]/a[@class='last']", func(e *colly.XMLElement) {
-		lastLink := e.ChildText("//@href")
-		allPage := ChapterListOrder(lastLink, "/", 2)
-		allNum, _ := strconv.Atoi(allPage)
-		for i := 1; i <= allNum; i++ {
+		//lastLink := e.ChildText("//@href")
+		//allPage := ChapterListOrder(lastLink, "/", 2)
+		//allNum, _ := strconv.Atoi(allPage)
+		//for i := 1; i <= allNum; i++ {
 			//获取分页数据并存入数据库
-			pageDomain := domain + "page/" + strconv.Itoa(i) + "/"
+			//pageDomain := domain + "page/" + strconv.Itoa(i) + "/"
+			pageDomain := domain + "page/2/"
 			GetLinks(pageDomain)
-		}
+		//}
 	})
 	c.Visit(domain)
 }
@@ -179,7 +180,8 @@ func GetLinks(pageDomain string) {
 			link := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[1]/a/@href")
 			title := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[1]/a/@title")
 			lastCharpter := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[2]/div[3]/div[1]/span[1]")
-
+			t1 := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[1]/a[1]/span[1]")
+			t2 := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[1]/a[1]/span[2]")
 			isExist, _ := redisPool.Do("HEXISTS", "book_all_lists", link)
 			spew.Dump(link)
 			//创建协程
@@ -190,7 +192,8 @@ func GetLinks(pageDomain string) {
 				lists.BookLink = link
 				lists.BookName = title
 				lists.LastChapter = lastCharpter
-				lists.Status = 1
+				lists.Status = 0
+				lists.Type = t1+","+t2
 				lid, err := o.Insert(&lists)
 				if err == nil {
 					_, err := redisPool.Do("HSET", "book_all_lists", link, lid)
@@ -207,7 +210,8 @@ func GetLinks(pageDomain string) {
 				o := orm.NewOrm()
 				lists := models.Links{Id:lId}
 				lists.LastChapter = lastCharpter
-				if num, err := o.Update(&lists, "LastChapter"); err == nil {
+				lists.Type = t1+","+t2
+				if num, err := o.Update(&lists, "LastChapter", "Type"); err == nil {
 					//有更新改变字段值
 					if num > 0 {
 						u := orm.NewOrm()
