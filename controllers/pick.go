@@ -29,7 +29,7 @@ type Json struct {
 //获取全部书籍链接
 func (p *PickController) Lists() {
 	domain := beego.AppConfig.String("source_1")
-	util.BookLists(domain)
+	go util.BookLists(domain)
 	p.MsgBack("采集全部图书链接完成", 1)
 }
 
