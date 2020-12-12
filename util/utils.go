@@ -77,6 +77,10 @@ func MKdirs(path string) {
 }
 
 func DownloadJpg(url string, file_name string)  {
+	bs := Exists(beego.AppConfig.String("comic_hub") + file_name)
+	if bs {
+		return
+	}
 	transport := &http.Transport{IdleConnTimeout: 0}
 	client := &http.Client{Transport: transport}
 	if url != "" {
@@ -95,7 +99,6 @@ func DownloadJpg(url string, file_name string)  {
 
 		if er != nil {
 			fmt.Println(er)
-			defer resp.Body.Close()
 			return
 		}
 		defer resp.Body.Close()
@@ -110,6 +113,15 @@ func DownloadJpg(url string, file_name string)  {
 		spew.Dump("已下载图片链接"+url)
 	}
 }
+//判断文件是否存在
+func Exists(path string) bool {
+	_, err := os.Stat(path)    //os.Stat获取文件信息
+	if os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
+
 
 func HandError(err error)  {
 	if err != nil{
