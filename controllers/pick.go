@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/cache"
 	"github.com/astaxie/beego/orm"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/garyburd/redigo/redis"
@@ -37,9 +38,16 @@ func (p *PickController) Lists() {
 func (p * PickController) Collection() {
 	//源ID
 	rootId, _ := strconv.Atoi(p.GetString("id"))
+	//是否用缓存
+	cacheId, _ := strconv.Atoi(p.GetString("cache"))
 	if rootId < 1 {
 		spew.Dump("规则ID不能为空")
 		os.Exit(1)
+	}
+
+	caches := false
+	if cacheId > 0 {
+		caches = true
 	}
 	//图书列表
 	rootList := p.GetString("list")
@@ -48,19 +56,20 @@ func (p * PickController) Collection() {
 		return
 	}
 	list := strings.Split(rootList, "\n")
-	spew.Dump(list)
+
+
 	all := int(len(list))
 	if all>1 {
 		var wg sync.WaitGroup
 		for _, val := range list {
 			//创建协程
 			wg.Add(1)
-			go Comics(val, rootId)
+			go Comics(val, rootId, caches)
 			wg.Done()
 		}
 		wg.Wait()
 	}else {
-		go Comics(rootList, rootId)
+		go Comics(rootList, rootId, caches)
 	}
 	//if all > 5 {
 	//	a := float64(all / 10)
@@ -92,11 +101,11 @@ func (p *PickController) MsgBack(msg string, status int)  {
 }
 
 //操作图书
-func Comics(domin string, rootId int) {
+func Comics(domin string, rootId int, cache bool) {
 	//获取指定规则
 	role := conf.Choose(rootId)
 	//爬取图书
-	bookInfo, chapterInfo := service.BookInfo(role, domin)
+	bookInfo, chapterInfo := service.BookInfo(role, domin, cache)
 	//图书ID
 	bId := 0
 	o := orm.NewOrm()
@@ -207,14 +216,11 @@ func Comics(domin string, rootId int) {
 			}
 
 			//协程下载图片
-			//if cId > 0 {
-			//	if s["imgs"] != "" {
-			//		go util.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"])
-			//	}
-			//}
-		}
-		if s["imgs"] != "" {
-			go util.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"])
+			if cId > 0 {
+				if s["imgs"] != "" {
+					go util.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"])
+				}
+			}
 		}
 
 	}

@@ -7,7 +7,7 @@ import (
 )
 
 //书目录
-func BookInfo(role *conf.MainRule, domin string) ([]map[string]string, []map[string]string) {
+func BookInfo(role *conf.MainRule, domin string, cache bool) ([]map[string]string, []map[string]string) {
 	//图书信息
 	var bookInfo []map[string]string
 	//章节信息
@@ -38,14 +38,17 @@ func BookInfo(role *conf.MainRule, domin string) ([]map[string]string, []map[str
 				chapterInfo,
 				map[string]string{"link": link, "title": title, "imgs": img, "ctime":ctime})
 		}
-		ctime := e.ChildText(role.CTime)
-		if ctime == "" {
-			ctime = e.ChildText(role.NCTime)
+		//不走缓存
+		if cache {
+			ctime := e.ChildText(role.CTime)
+			if ctime == "" {
+				ctime = e.ChildText(role.NCTime)
+			}
+			img := GetDetail(role, link)
+			chapterInfo = append(
+				chapterInfo,
+				map[string]string{"link": link, "title": title, "imgs": img, "ctime":ctime})
 		}
-		img := GetDetail(role, link)
-		chapterInfo = append(
-			chapterInfo,
-			map[string]string{"link": link, "title": title, "imgs": img, "ctime":ctime})
 	})
 	c.OnXML(role.Body, func(e *colly.XMLElement) {
 		//图书名
