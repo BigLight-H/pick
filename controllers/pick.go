@@ -49,7 +49,19 @@ func (p * PickController) Collection() {
 	}
 	list := strings.Split(rootList, "\n")
 	spew.Dump(list)
-	//all := int(len(list))
+	all := int(len(list))
+	if all>1 {
+		var wg sync.WaitGroup
+		for _, val := range list {
+			//创建协程
+			wg.Add(1)
+			go Comics(val, rootId)
+			wg.Done()
+		}
+		wg.Wait()
+	}else {
+		go Comics(rootList, rootId)
+	}
 	//if all > 5 {
 	//	a := float64(all / 10)
 	//	num := int(math.Floor(a + 0/5))
@@ -64,15 +76,6 @@ func (p * PickController) Collection() {
 	//		wg.Wait()
 	//	}
 	//} else {
-		var wg sync.WaitGroup
-		for _, val := range list {
-			//创建协程
-			wg.Add(1)
-			spew.Dump(val)
-			go Comics(val, rootId)
-			wg.Done()
-		}
-		wg.Wait()
 	//}
 
 	p.MsgBack("采集资源完成", 1)
