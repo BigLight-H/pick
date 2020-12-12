@@ -358,11 +358,11 @@ func ComicsCopy(domin string, rootId int) {
 			}
 
 			//协程下载图片
-			if cId > 0 {
+			//if cId > 0 {
 				if s["imgs"] != "" {
 					go DoWork(bookid+"/"+epid, s["imgs"], bookid, epid)
 				}
-			}
+			//}
 		}
 
 
