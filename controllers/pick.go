@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/cache"
 	"github.com/astaxie/beego/orm"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/garyburd/redigo/redis"
@@ -101,11 +100,11 @@ func (p *PickController) MsgBack(msg string, status int)  {
 }
 
 //操作图书
-func Comics(domin string, rootId int, cache bool) {
+func Comics(domin string, rootId int, caches bool) {
 	//获取指定规则
 	role := conf.Choose(rootId)
 	//爬取图书
-	bookInfo, chapterInfo := service.BookInfo(role, domin, cache)
+	bookInfo, chapterInfo := service.BookInfo(role, domin, caches)
 	//图书ID
 	bId := 0
 	o := orm.NewOrm()

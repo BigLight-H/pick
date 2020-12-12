@@ -7,7 +7,7 @@ import (
 )
 
 //书目录
-func BookInfo(role *conf.MainRule, domin string, cache bool) ([]map[string]string, []map[string]string) {
+func BookInfo(role *conf.MainRule, domin string, caches bool) ([]map[string]string, []map[string]string) {
 	//图书信息
 	var bookInfo []map[string]string
 	//章节信息
@@ -39,7 +39,7 @@ func BookInfo(role *conf.MainRule, domin string, cache bool) ([]map[string]strin
 				map[string]string{"link": link, "title": title, "imgs": img, "ctime":ctime})
 		}
 		//不走缓存
-		if cache {
+		if caches {
 			ctime := e.ChildText(role.CTime)
 			if ctime == "" {
 				ctime = e.ChildText(role.NCTime)
