@@ -205,7 +205,7 @@ func Comics(domin string, rootId int) {
 			//协程下载图片
 			if cId > 0 {
 				if s["imgs"] != "" {
-					go util.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid)
+					go util.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"])
 				}
 			}
 		}
