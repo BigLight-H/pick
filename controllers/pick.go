@@ -226,24 +226,40 @@ func Comics(domin string, rootId int, caches bool) {
 
 }
 
+//初始化写入redis值
 func (p *PickController) SaveRedis() {
 	o := orm.NewOrm()
 	//链接redis
 	redisPool := models.ConnectRedisPool()
 	defer redisPool.Close()
-	spew.Dump(111)
 	//获取全部链接
 	var links []*models.Links
 	_, _ = o.QueryTable(new(models.Links).TableName()).All(&links)
 	for _, value := range links {
 		spew.Dump(value.Id)
+		_, err := redisPool.Do("HSET", "book_all_lists", value.BookLink, value.Id)
+		if err != nil {
+			spew.Dump("redis初始化链接存入错误")
+		}
 	}
-	os.Exit(2)
 	//获取全部章节图书链接
 	var lists []*models.BookList
-	o.QueryTable(new(models.BookList).TableName()).All(&lists)
+	_, _ = o.QueryTable(new(models.BookList).TableName()).All(&lists)
+	for _, value1 := range lists {
+		_, err1 := redisPool.Do("HSET", "comic_links", value1.DomainName, value1.BookId)
+		if err1 != nil {
+			spew.Dump("初始化漫画ID存入错误")
+		}
+	}
 	//获取全部章节链接
 	var epLists []*models.BookEpisode
-	o.QueryTable(new(models.BookEpisode).TableName()).All(&epLists)
-	p.MsgBack("初始化完成", 1)
+	_, _ = o.QueryTable(new(models.BookEpisode).TableName()).All(&epLists)
+	for _, value2 := range epLists {
+		_, err2 := redisPool.Do("HSET", "chapter_links", value2.Link, 1)
+		if err2 != nil {
+			spew.Dump("初始化存入章节链接到redis错误")
+		}
+	}
+
+	p.MsgBack("初始化链接进入redis完成", 1)
 }
