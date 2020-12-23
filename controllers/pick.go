@@ -227,7 +227,7 @@ func Comics(domin string, rootId int, caches bool) {
 
 }
 
-func (p *PickController) saveRedis() {
+func (p *PickController) SaveRedis() {
 	//链接redis
 	redisPool := models.ConnectRedisPool()
 	defer redisPool.Close()
