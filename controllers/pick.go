@@ -229,8 +229,8 @@ func Comics(domin string, rootId int, caches bool) {
 
 func (p *PickController) SaveRedis() {
 	//链接redis
-	redisPool := models.ConnectRedisPool()
-	defer redisPool.Close()
+	//redisPool := models.ConnectRedisPool()
+	//defer redisPool.Close()
 	//获取全部链接
 	var links []*models.Links
 	p.o.QueryTable(new(models.Links).TableName()).All(&links)
@@ -242,4 +242,5 @@ func (p *PickController) SaveRedis() {
 	//获取全部章节链接
 	var epLists []*models.BookEpisode
 	p.o.QueryTable(new(models.BookEpisode).TableName()).All(&epLists)
+	p.MsgBack("初始化完成", 1)
 }
