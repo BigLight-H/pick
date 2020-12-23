@@ -233,21 +233,17 @@ func (p *PickController) SaveRedis() {
 	defer redisPool.Close()
 	spew.Dump(111)
 	//获取全部链接
-	//links := []*models.Links{}
-	//_, _ = p.o.QueryTable(new(models.Links).TableName()).All(&links)
-
-
-	class := []*models.Links{}
-	qs := o.QueryTable(new(models.Links).TableName())
-	_, _ = qs.All(&class)
-	spew.Dump(class)
-
-	//os.Exit(2)
-	////获取全部章节图书链接
-	//var lists []*models.BookList
-	//p.o.QueryTable(new(models.BookList).TableName()).All(&lists)
-	////获取全部章节链接
-	//var epLists []*models.BookEpisode
-	//p.o.QueryTable(new(models.BookEpisode).TableName()).All(&epLists)
+	var links []*models.Links
+	_, _ = o.QueryTable(new(models.Links).TableName()).All(&links)
+	for index, value := range links {
+		fmt.Println("index=", index, "value=", value)
+	}
+	os.Exit(2)
+	//获取全部章节图书链接
+	var lists []*models.BookList
+	o.QueryTable(new(models.BookList).TableName()).All(&lists)
+	//获取全部章节链接
+	var epLists []*models.BookEpisode
+	o.QueryTable(new(models.BookEpisode).TableName()).All(&epLists)
 	p.MsgBack("初始化完成", 1)
 }
