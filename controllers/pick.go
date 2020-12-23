@@ -233,8 +233,8 @@ func (p *PickController) SaveRedis() {
 	defer redisPool.Close()
 	spew.Dump(111)
 	//获取全部链接
-	var links []*models.Links
-	p.o.QueryTable(new(models.Links).TableName()).All(&links)
+	links := []*models.Links{}
+	_, _ = p.o.QueryTable(new(models.Links).TableName()).All(&links)
 	spew.Dump(links)
 	os.Exit(2)
 	//获取全部章节图书链接
