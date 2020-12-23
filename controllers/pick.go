@@ -18,7 +18,6 @@ import (
 
 type PickController struct {
 	beego.Controller
-	o orm.Ormer
 }
 
 //Json结构体
@@ -228,6 +227,7 @@ func Comics(domin string, rootId int, caches bool) {
 }
 
 func (p *PickController) SaveRedis() {
+	o := orm.NewOrm()
 	//链接redis
 	redisPool := models.ConnectRedisPool()
 	defer redisPool.Close()
@@ -238,7 +238,7 @@ func (p *PickController) SaveRedis() {
 
 
 	class := []*models.Links{}
-	qs := p.o.QueryTable(new(models.Links).TableName())
+	qs := o.QueryTable(new(models.Links).TableName())
 	_, _ = qs.All(&class)
 	spew.Dump(class)
 
