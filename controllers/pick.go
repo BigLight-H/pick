@@ -235,8 +235,8 @@ func (p *PickController) SaveRedis() {
 	//获取全部链接
 	var links []*models.Links
 	_, _ = o.QueryTable(new(models.Links).TableName()).All(&links)
-	for index, value := range links {
-		fmt.Println("index=", index, "value=", value)
+	for _, value := range links {
+		spew.Dump(value.Id)
 	}
 	os.Exit(2)
 	//获取全部章节图书链接
