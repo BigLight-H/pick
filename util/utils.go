@@ -204,8 +204,7 @@ func GetLinks(pageDomain string) {
 			isExist, _ := redisPool.Do("HEXISTS", "book_all_lists", link)
 			spew.Dump(link)
 			//创建协程
-			//wg.Add(1)
-			if isExist != int64(1) {
+			if isExist == int64(0) {
 				o := orm.NewOrm()
 				lists := models.Links{}
 				lists.BookLink = link
@@ -215,12 +214,11 @@ func GetLinks(pageDomain string) {
 				lists.Type = t1+","+t2
 				lid, err := o.Insert(&lists)
 				if err == nil {
-					_, err := redisPool.Do("HSET", "book_all_lists", link, lid)
-					if err != nil {
+					_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
+					if err2 != nil {
 						spew.Dump("漫画链接存入错误")
 					}
 					go ComicsCopy(link, 1)
-					//wg.Done()
 				}
 			} else {
 				lid, err := redisPool.Do("HGET", "book_all_lists", link)
@@ -236,14 +234,12 @@ func GetLinks(pageDomain string) {
 						u := orm.NewOrm()
 						up := models.Links{Id:lId}
 						up.Status = 1
-						if num2, err2 := u.Update(&lists, "Status"); err2 == nil {
+						if num2, err2 := u.Update(&lists, "Status"); err2 != nil {
 							spew.Dump(num2)
 						}
-						//go ComicsCopy(link, 1)
-						//wg.Done()
 					}
+					go ComicsCopy(link, 1)
 				}
-				go ComicsCopy(link, 1)
 			}
 
 		}

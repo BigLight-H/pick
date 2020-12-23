@@ -18,6 +18,7 @@ import (
 
 type PickController struct {
 	beego.Controller
+	o orm.Ormer
 }
 
 //Json结构体
@@ -113,7 +114,7 @@ func Comics(domin string, rootId int, caches bool) {
 		redisPool := models.ConnectRedisPool()
 		defer redisPool.Close()
 		isExist, _ := redisPool.Do("HEXISTS", "comic_links", domin)
-		if isExist != int64(1) {
+		if isExist == int64(0) {
 			//存入数据库
 			book := models.BookList{}
 			book.DomainName = domin
@@ -224,4 +225,21 @@ func Comics(domin string, rootId int, caches bool) {
 
 	}
 
+}
+
+func (p *PickController) saveRedis() {
+	//链接redis
+	redisPool := models.ConnectRedisPool()
+	defer redisPool.Close()
+	//获取全部链接
+	var links []*models.Links
+	p.o.QueryTable(new(models.Links).TableName()).All(&links)
+	spew.Dump(links)
+	os.Exit(2)
+	//获取全部章节图书链接
+	var lists []*models.BookList
+	p.o.QueryTable(new(models.BookList).TableName()).All(&lists)
+	//获取全部章节链接
+	var epLists []*models.BookEpisode
+	p.o.QueryTable(new(models.BookEpisode).TableName()).All(&epLists)
 }
