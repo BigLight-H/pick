@@ -280,7 +280,7 @@ func ComicsCopy(domin string, rootId int) {
 			book.DomainName = domin
 			book.BookTitle = v["name"]
 			book.BookTags = v["tags"]
-			book.BookProfile = v["intro"]
+			book.BookProfile = SubString(v["intro"], 0, 300)
 			book.BookStat = 0
 			if v["status"] == "Completed" {
 				book.BookStat = 1
@@ -389,4 +389,24 @@ func ComicsCopy(domin string, rootId int) {
 			}
 		}
 	}
+}
+//截取指定长度的字符串
+func SubString(source string, start int, end int) string {
+	var r = []rune(source)
+	length := len(r)
+
+	if start < 0 || end > length || start > end {
+		return ""
+	}
+
+	if start == 0 && end == length {
+		return source
+	}
+
+	var substring = ""
+	for i := start; i < length; i++ {
+		substring += string(r[i])
+	}
+
+	return substring
 }
