@@ -298,6 +298,7 @@ func ComicsCopy(domin string, rootId int) {
 			book.UserBuy = RandomNum(4)
 			book.BookThumbnail = ""
 			book.IsAgeLimit = 1
+			book.Status = 0
 			id, _ := o.Insert(&book)
 			bId = int(id)
 			if id > int64(0) {

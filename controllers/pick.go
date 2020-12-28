@@ -137,6 +137,7 @@ func Comics(domin string, rootId int, caches bool) {
 			book.UserBuy = util.RandomNum(4)
 			book.BookThumbnail = ""
 			book.IsAgeLimit = 1
+			book.Satus = 0
 			id, _ := o.Insert(&book)
 			bId = int(id)
 			if id > int64(0) {

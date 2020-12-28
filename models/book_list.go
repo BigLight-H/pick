@@ -19,6 +19,7 @@ type BookList struct {
 	NowStatus       	string
 	LastTime   			string
 	DomainName   		string
+	Status   		    int
 }
 
 func (m *BookList) TableName() string {
