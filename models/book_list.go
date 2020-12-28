@@ -14,12 +14,15 @@ type BookList struct {
 	TimesRead   		string
 	TimesSubscribed   	string
 	UserBuy   			string
+	UserRead   			string
 	Year       			string
 	Star       			string
 	NowStatus       	string
 	LastTime   			string
 	DomainName   		string
 	Status   		    int
+	CreateTime   		string
+	UpdateTime   		string
 }
 
 func (m *BookList) TableName() string {

@@ -298,9 +298,12 @@ func ComicsCopy(domin string, rootId int) {
 			book.TimesRead = RandomNum(4)
 			book.TimesSubscribed = RandomNum(4)
 			book.UserBuy = RandomNum(4)
+			book.UserRead = RandomNum(4)
 			book.BookThumbnail = ""
 			book.IsAgeLimit = 1
 			book.Status = 0
+			book.CreateTime = string(time.Now().Unix())
+			book.UpdateTime = string(time.Now().Unix())
 			id, _ := o.Insert(&book)
 			bId = int(id)
 			if id > int64(0) && bId > 0 {
@@ -392,6 +395,7 @@ func ComicsCopy(domin string, rootId int) {
 		}
 	}
 }
+
 //截取指定长度的字符串
 func SubString(source string, start int, end int) string {
 	var r = []rune(source)
