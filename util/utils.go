@@ -274,7 +274,7 @@ func ComicsCopy(domin string, rootId int) {
 		redisPool := models.ConnectRedisPool()
 		defer redisPool.Close()
 		isExist, _ := redisPool.Do("HEXISTS", "comic_links", domin)
-		if isExist != int64(1) {
+		if isExist == int64(0) {
 			//存入数据库
 			book := models.BookList{}
 			book.DomainName = domin
@@ -301,7 +301,7 @@ func ComicsCopy(domin string, rootId int) {
 			book.Status = 0
 			id, _ := o.Insert(&book)
 			bId = int(id)
-			if id > int64(0) {
+			if id > int64(0) && bId > 0 {
 				up := models.BookList{BookId: bId}
 				bookid := strconv.Itoa(bId)
 				up.BookThumbnail = bookid+"/"+bookid+"_thumb.jpg"
@@ -312,21 +312,22 @@ func ComicsCopy(domin string, rootId int) {
 					//下载封面图片到目录
 					DownloadJpg(v["image"], bookid+"/"+bookid+"_thumb.jpg")
 				}
-			}
-			_, err := redisPool.Do("HSET", "comic_links", domin, bId)
-			if err != nil {
-				spew.Dump("漫画ID存入错误")
+				_, err := redisPool.Do("HSET", "comic_links", domin, bId)
+				if err != nil {
+					spew.Dump("漫画ID存入错误")
+				}
 			}
 		} else {
 			comicId, err := redisPool.Do("HGET", "comic_links", domin)
 			bookId, _ := redis.Int(comicId, err)
 			bId = bookId
 			//修改书本最新更新时间
-
-			oldBook := models.BookList{BookId: bId}
-			oldBook.LastTime = v["ltime"]
-			if num, err := o.Update(&oldBook, "LastTime"); err != nil {
-				fmt.Println(num)
+			if bId > 0 {
+				oldBook := models.BookList{BookId: bId}
+				oldBook.LastTime = v["ltime"]
+				if num, err := o.Update(&oldBook, "LastTime"); err != nil {
+					fmt.Println(num)
+				}
 			}
 		}
 	}
@@ -351,37 +352,39 @@ func ComicsCopy(domin string, rootId int) {
 
 		// 三个返回参数依次为：是否新创建的，对象 Id 值，错误
 		if created, cid, err := c.ReadOrCreate(&chapter, "Link"); err == nil {
+			cId = int(cid)
 			if created {
-				cId = int(cid)
-				//图片路径
-				imgRole := bookid +"/"+ epid +"/"+ bookid +"0"+ epid +"_thumb.jpg"
-				upimg := models.BookEpisode{Id: cId}
-				upimg.EpisodeThumbnail = bookid +"/"+ epid +"/"+ bookid +"0"+ epid +"_thumb.jpg"
-				num, _ := c.Update(&upimg, "EpisodeThumbnail")
-				if num > int64(0) {
-					//创建章节目录
-					MKdirs(bookid + "/" + epid)
-					//下载章节首张图片
-					DownloadJpg(fImg, imgRole)
-
+				if cId > 0 {
+					//图片路径
+					imgRole := bookid +"/"+ epid +"/"+ bookid +"0"+ epid +"_thumb.jpg"
+					upimg := models.BookEpisode{Id: cId}
+					upimg.EpisodeThumbnail = bookid +"/"+ epid +"/"+ bookid +"0"+ epid +"_thumb.jpg"
+					num, _ := c.Update(&upimg, "EpisodeThumbnail")
+					if num > int64(0) {
+						//创建章节目录
+						MKdirs(bookid + "/" + epid)
+						//下载章节首张图片
+						DownloadJpg(fImg, imgRole)
+						//下载图片
+						if s["imgs"] != "" {
+							go DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"])
+						}
+					}
 				}
 			} else {
-				cId = int(cid)
-				//修改章节最后更新时间
-				oldChapter := models.BookEpisode{Id: cId}
-				oldChapter.LastTime = s["ctime"]
-				num, _ := c.Update(&oldChapter, "LastTime")
-				if num > int64(0) {
-					spew.Dump(num)
+				if cId > 0 {
+					//修改章节最后更新时间
+					oldChapter := models.BookEpisode{Id: cId}
+					oldChapter.LastTime = s["ctime"]
+					num, _ := c.Update(&oldChapter, "LastTime")
+					if num > int64(0) {
+						//下载图片
+						if s["imgs"] != "" {
+							go DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"])
+						}
+					}
 				}
 			}
-
-			//协程下载图片
-			//if cId > 0 {
-				if s["imgs"] != "" {
-					go DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"])
-				}
-			//}
 		}
 
 
