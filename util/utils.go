@@ -205,20 +205,22 @@ func GetLinks(pageDomain string) {
 			spew.Dump(link)
 			//创建协程
 			if isExist == int64(0) {
-				o := orm.NewOrm()
-				lists := models.Links{}
-				lists.BookLink = link
-				lists.BookName = title
-				lists.LastChapter = lastCharpter
-				lists.Status = 0
-				lists.Type = t1+","+t2
-				lid, err := o.Insert(&lists)
-				if err == nil {
-					_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
-					if err2 != nil {
-						spew.Dump("漫画链接存入错误")
+				if link != "" {
+					o := orm.NewOrm()
+					lists := models.Links{}
+					lists.BookLink = link
+					lists.BookName = title
+					lists.LastChapter = lastCharpter
+					lists.Status = 0
+					lists.Type = t1+","+t2
+					lid, err := o.Insert(&lists)
+					if err == nil {
+						_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
+						if err2 != nil {
+							spew.Dump("漫画链接存入错误")
+						}
+						go ComicsCopy(link, 1)
 					}
-					go ComicsCopy(link, 1)
 				}
 			} else {
 				lid, err := redisPool.Do("HGET", "book_all_lists", link)
