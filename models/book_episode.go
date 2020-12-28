@@ -12,5 +12,5 @@ type BookEpisode struct {
 }
 
 func (m *BookEpisode) TableName() string {
-	return TableName("book_episode")
+	return TableName("episode")
 }
