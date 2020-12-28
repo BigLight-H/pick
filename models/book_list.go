@@ -23,5 +23,5 @@ type BookList struct {
 }
 
 func (m *BookList) TableName() string {
-	return TableName("book_list")
+	return TableName("list")
 }
