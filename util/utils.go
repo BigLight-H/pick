@@ -332,62 +332,61 @@ func ComicsCopy(domin string, rootId int) {
 		}
 	}
 	bookid := strconv.Itoa(bId)
-	for _, s := range chapterInfo {
-		//切割链接
-		_, son := GetSubdirectory(s["link"])
-		epid := ChapterOrder(son, "-", 1)
-		//存入章节表
-		c := orm.NewOrm()
-		chapter := models.BookEpisode{}
-		chapter.BookId = bId
-		chapter.EpisodeTitle = s["title"]
-		chapter.EpisodeId = epid
-		imgLen, fImg := SumImgs(s["imgs"])
-		chapter.EpisodeImgtotal = imgLen
-		chapter.EpisodeThumbnail = ""
-		chapter.LastTime = s["ctime"]
-		chapter.Link = s["link"]
-		//cId, _ := c.Insert(&chapter)
-		cId := 0
+	if bId > 0 {
+		for _, s := range chapterInfo {
+			//切割链接
+			_, son := GetSubdirectory(s["link"])
+			epid := ChapterOrder(son, "-", 1)
+			//存入章节表
+			c := orm.NewOrm()
+			chapter := models.BookEpisode{}
+			chapter.BookId = bId
+			chapter.EpisodeTitle = s["title"]
+			chapter.EpisodeId = epid
+			imgLen, fImg := SumImgs(s["imgs"])
+			chapter.EpisodeImgtotal = imgLen
+			chapter.EpisodeThumbnail = ""
+			chapter.LastTime = s["ctime"]
+			chapter.Link = s["link"]
+			//cId, _ := c.Insert(&chapter)
+			cId := 0
 
-		// 三个返回参数依次为：是否新创建的，对象 Id 值，错误
-		if created, cid, err := c.ReadOrCreate(&chapter, "Link"); err == nil {
-			cId = int(cid)
-			if created {
-				if cId > 0 {
-					//图片路径
-					imgRole := bookid +"/"+ epid +"/"+ bookid +"0"+ epid +"_thumb.jpg"
-					upimg := models.BookEpisode{Id: cId}
-					upimg.EpisodeThumbnail = bookid +"/"+ epid +"/"+ bookid +"0"+ epid +"_thumb.jpg"
-					num, _ := c.Update(&upimg, "EpisodeThumbnail")
-					if num > int64(0) {
-						//创建章节目录
-						MKdirs(bookid + "/" + epid)
-						//下载章节首张图片
-						DownloadJpg(fImg, imgRole)
-						//下载图片
-						if s["imgs"] != "" {
-							go DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"])
+			// 三个返回参数依次为：是否新创建的，对象 Id 值，错误
+			if created, cid, err := c.ReadOrCreate(&chapter, "Link"); err == nil {
+				cId = int(cid)
+				if created {
+					if cId > 0 {
+						//图片路径
+						imgRole := bookid +"/"+ epid +"/"+ bookid +"0"+ epid +"_thumb.jpg"
+						upimg := models.BookEpisode{Id: cId}
+						upimg.EpisodeThumbnail = bookid +"/"+ epid +"/"+ bookid +"0"+ epid +"_thumb.jpg"
+						num, _ := c.Update(&upimg, "EpisodeThumbnail")
+						if num > int64(0) {
+							//创建章节目录
+							MKdirs(bookid + "/" + epid)
+							//下载章节首张图片
+							DownloadJpg(fImg, imgRole)
+							//下载图片
+							if s["imgs"] != "" {
+								go DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"])
+							}
 						}
 					}
-				}
-			} else {
-				if cId > 0 {
-					//修改章节最后更新时间
-					oldChapter := models.BookEpisode{Id: cId}
-					oldChapter.LastTime = s["ctime"]
-					num, _ := c.Update(&oldChapter, "LastTime")
-					if num > int64(0) {
-						//下载图片
-						if s["imgs"] != "" {
-							go DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"])
+				} else {
+					if cId > 0 {
+						//修改章节最后更新时间
+						oldChapter := models.BookEpisode{Id: cId}
+						oldChapter.LastTime = s["ctime"]
+						num, _ := c.Update(&oldChapter, "LastTime")
+						if num > int64(0) {
+							//下载图片
+							if s["imgs"] != "" {
+								go DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"])
+							}
 						}
 					}
 				}
 			}
 		}
-
-
 	}
-
 }
