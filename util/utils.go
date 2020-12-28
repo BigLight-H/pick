@@ -403,10 +403,5 @@ func SubString(source string, start int, end int) string {
 		return source
 	}
 
-	var substring = ""
-	for i := start; i < length; i++ {
-		substring += string(r[i])
-	}
-
-	return substring
+	return string(r[start : end])
 }
