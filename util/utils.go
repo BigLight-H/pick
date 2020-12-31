@@ -232,7 +232,7 @@ func GetLinks(pageDomain string) {
 				lists.Type = t1+","+t2
 				if num1, err1 := o.Update(&lists, "LastChapter", "Type"); err1 == nil {
 					//有更新改变字段值
-					if num1 > 0 {
+					if num1 == int64(1) {
 						u := orm.NewOrm()
 						up := models.Links{Id:lId}
 						up.Status = 1
