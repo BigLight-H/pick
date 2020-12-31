@@ -21,8 +21,8 @@ type BookList struct {
 	LastTime   			string
 	DomainName   		string
 	Status   		    int
-	CreateTime   		string
-	UpdateTime   		string
+	CreateTime   		int64
+	UpdateTime   		int64
 }
 
 func (m *BookList) TableName() string {

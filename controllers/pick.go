@@ -140,8 +140,8 @@ func Comics(domin string, rootId int, caches bool) {
 			book.BookThumbnail = ""
 			book.IsAgeLimit = 1
 			book.Status = 0
-			book.CreateTime = string(time.Now().Unix())
-			book.UpdateTime = string(time.Now().Unix())
+			book.CreateTime = time.Now().Unix()
+			book.UpdateTime = time.Now().Unix()
 			id, _ := o.Insert(&book)
 			bId = int(id)
 			if id > int64(0) && bId > 0 {
