@@ -206,7 +206,7 @@ func Comics(domin string, rootId int, caches bool) {
 						//创建章节目录
 						util.MKdirs(bookid + "/" + epid)
 						//下载章节首张图片
-						util.DownloadJpg(fImg, imgRole, caches)
+						util.DownloadJpg(fImg, imgRole, false)
 						if s["imgs"] != "" {
 							go util.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"], caches)
 						}
@@ -220,7 +220,7 @@ func Comics(domin string, rootId int, caches bool) {
 						//创建章节目录
 						util.MKdirs(bookid + "/" + epid)
 						//下载章节首张图片
-						util.DownloadJpg(fImg, imgRole, caches)
+						util.DownloadJpg(fImg, imgRole, false)
 						if s["imgs"] != "" {
 							go util.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"],caches)
 						}
