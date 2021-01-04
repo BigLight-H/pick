@@ -153,7 +153,7 @@ func Comics(domin string, rootId int, caches bool) {
 					//新建文件目录
 					util.MKdirs(bookid)
 					//下载封面图片到目录
-					util.DownloadJpg(v["image"], bookid+"/"+bookid+"_thumb.jpg")
+					util.DownloadJpg(v["image"], bookid+"/"+bookid+"_thumb.jpg", caches)
 				}
 				_, err := redisPool.Do("HSET", "comic_links", domin, bId)
 				if err != nil {
