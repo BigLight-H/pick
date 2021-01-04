@@ -217,7 +217,7 @@ func Comics(domin string, rootId int, caches bool) {
 					oldChapter := models.BookEpisode{Id: cId}
 					oldChapter.LastTime = s["ctime"]
 					num, _ := c.Update(&oldChapter, "LastTime")
-					if num > int64(0) {
+					if num > int64(0) || caches {
 						if s["imgs"] != "" {
 							go util.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"],caches)
 						}
