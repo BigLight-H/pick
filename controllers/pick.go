@@ -193,13 +193,12 @@ func Comics(domin string, rootId int, caches bool) {
 			chapter.Link = s["link"]
 			//cId, _ := c.Insert(&chapter)
 			cId := 0
-
+			//图片路径
+			imgRole := bookid +"/"+ epid +"/"+ bookid +"0"+ epid +"_thumb.jpg"
 			// 三个返回参数依次为：是否新创建的，对象 Id 值，错误
 			if created, cid, err := c.ReadOrCreate(&chapter, "Link"); err == nil {
 				cId = int(cid)
 				if created {
-					//图片路径
-					imgRole := bookid +"/"+ epid +"/"+ bookid +"0"+ epid +"_thumb.jpg"
 					upimg := models.BookEpisode{Id: cId}
 					upimg.EpisodeThumbnail = bookid +"/"+ epid +"/"+ bookid +"0"+ epid +"_thumb.jpg"
 					num, _ := c.Update(&upimg, "EpisodeThumbnail")
@@ -218,6 +217,10 @@ func Comics(domin string, rootId int, caches bool) {
 					oldChapter.LastTime = s["ctime"]
 					num, _ := c.Update(&oldChapter, "LastTime")
 					if num > int64(0) || caches {
+						//创建章节目录
+						util.MKdirs(bookid + "/" + epid)
+						//下载章节首张图片
+						util.DownloadJpg(fImg, imgRole, caches)
 						if s["imgs"] != "" {
 							go util.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"],caches)
 						}
