@@ -27,19 +27,8 @@ func BookInfo(role *conf.MainRule, domin string, caches bool) ([]map[string]stri
 		link := e.ChildText(role.Title)
 		isExist, _ := redisPool.Do("HEXISTS", "chapter_links", link)
 		//章节链接不存在redis里面采集
-		if isExist != int64(1) {
+		if isExist != int64(1) || caches {
 			//章节更新时间
-			ctime := e.ChildText(role.CTime)
-			if ctime == "" {
-				ctime = e.ChildText(role.NCTime)
-			}
-			img := GetDetail(role, link)
-			chapterInfo = append(
-				chapterInfo,
-				map[string]string{"link": link, "title": title, "imgs": img, "ctime":ctime})
-		}
-		//不走缓存
-		if caches {
 			ctime := e.ChildText(role.CTime)
 			if ctime == "" {
 				ctime = e.ChildText(role.NCTime)
@@ -82,6 +71,7 @@ func BookInfo(role *conf.MainRule, domin string, caches bool) ([]map[string]stri
 	return bookInfo, chapterInfo
 }
 
+//获取章节全部图片
 func GetDetail(role *conf.MainRule, domin string) string {
 	cs := colly.NewCollector()
 	var img string

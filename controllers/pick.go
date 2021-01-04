@@ -207,9 +207,9 @@ func Comics(domin string, rootId int, caches bool) {
 						//创建章节目录
 						util.MKdirs(bookid + "/" + epid)
 						//下载章节首张图片
-						util.DownloadJpg(fImg, imgRole)
+						util.DownloadJpg(fImg, imgRole, caches)
 						if s["imgs"] != "" {
-							go util.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"])
+							go util.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"], caches)
 						}
 					}
 				} else {
@@ -219,7 +219,7 @@ func Comics(domin string, rootId int, caches bool) {
 					num, _ := c.Update(&oldChapter, "LastTime")
 					if num > int64(0) {
 						if s["imgs"] != "" {
-							go util.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"])
+							go util.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"],caches)
 						}
 					}
 				}

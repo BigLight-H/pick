@@ -76,9 +76,9 @@ func MKdirs(path string) {
 	}
 }
 
-func DownloadJpg(url string, file_name string)  {
+func DownloadJpg(url string, file_name string, caches bool)  {
 	bs := Exists(beego.AppConfig.String("comic_hub") + file_name)
-	if bs {
+	if bs && !caches {
 		return
 	}
 	transport := &http.Transport{IdleConnTimeout: 0}
@@ -90,7 +90,7 @@ func DownloadJpg(url string, file_name string)  {
 			return
 		}
 
-		req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.108 Safari/537.2222")
+		req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36")
 		req.Header.Add("Referer","https://www.webtoon.xyz/")
 
 		req.Close = true
@@ -129,7 +129,7 @@ func HandError(err error)  {
 	}
 }
 
-func DoWork(dir string, imgs string, bid string, eid string, link string) {
+func DoWork(dir string, imgs string, bid string, eid string, link string, caches bool) {
 	imgArr := strings.Split(imgs, ",")
 	//删除第最后一个元素
 	if len(imgArr) > 0 {
@@ -137,7 +137,7 @@ func DoWork(dir string, imgs string, bid string, eid string, link string) {
 		for _, value := range imgArr{
 			imgAr := strings.Split(value, "/")
 			name := imgAr[len(imgAr)-1]
-			go DownloadJpg(value, dir+"/"+bid+"0"+eid+name)
+			go DownloadJpg(value, dir+"/"+bid+"0"+eid+name, caches)
 		}
 		//存储章节爬取记录
 		redisPool := models.ConnectRedisPool()
@@ -315,7 +315,7 @@ func ComicsCopy(domin string, rootId int) {
 					//新建文件目录
 					MKdirs(bookid)
 					//下载封面图片到目录
-					DownloadJpg(v["image"], bookid+"/"+bookid+"_thumb.jpg")
+					DownloadJpg(v["image"], bookid+"/"+bookid+"_thumb.jpg", false)
 				}
 				_, err := redisPool.Do("HSET", "comic_links", domin, bId)
 				if err != nil {
@@ -370,10 +370,10 @@ func ComicsCopy(domin string, rootId int) {
 							//创建章节目录
 							MKdirs(bookid + "/" + epid)
 							//下载章节首张图片
-							DownloadJpg(fImg, imgRole)
+							DownloadJpg(fImg, imgRole, false)
 							//下载图片
 							if s["imgs"] != "" {
-								go DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"])
+								go DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"], false)
 							}
 						}
 					}
@@ -386,7 +386,7 @@ func ComicsCopy(domin string, rootId int) {
 						if num > int64(0) {
 							//下载图片
 							if s["imgs"] != "" {
-								go DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"])
+								go DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"], false)
 							}
 						}
 					}
@@ -410,4 +410,30 @@ func SubString(source string, start int, end int) string {
 	}
 
 	return string(r[start : end])
+}
+
+//增加进程数
+func AddProcessNum() {
+	redisPool := models.ConnectRedisPool()
+	defer redisPool.Close()
+	_, err2 := redisPool.Do("incr", "process-nums", 1)
+	if err2 != nil {
+		spew.Dump("增加进程数值错误")
+	}
+	val, err := redisPool.Do("get", "process-nums")
+	num, _ := redis.Int(val, err)
+	if num < 0 {
+		//重置
+		_, _ = redisPool.Do("set", "process-nums", 1)
+	}
+}
+
+//减去进程数
+func MinusProcessNum() {
+	redisPool := models.ConnectRedisPool()
+	defer redisPool.Close()
+	_, err2 := redisPool.Do("incr", "process-nums", 1)
+	if err2 != nil {
+		spew.Dump("增加完成数值错误")
+	}
 }
