@@ -166,6 +166,11 @@ func Comics(domin string, rootId int, caches bool) {
 			bId = bookId
 			//修改书本最新更新时间
 			if bId > 0 {
+				bookid := strconv.Itoa(bId)
+				//新建文件目录
+				util.MKdirs(bookid)
+				//下载封面图片到目录
+				util.DownloadJpg(v["image"], bookid+"/"+bookid+"_thumb.jpg", false)
 				oldBook := models.BookList{BookId: bId}
 				oldBook.LastTime = v["ltime"]
 				if num, err := o.Update(&oldBook, "LastTime"); err != nil {
