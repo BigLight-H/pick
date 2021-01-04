@@ -78,6 +78,7 @@ func MKdirs(path string) {
 
 func DownloadJpg(url string, file_name string, caches bool)  {
 	bs := Exists(beego.AppConfig.String("comic_hub") + file_name)
+	spew.Dump(bs)
 	if bs && !caches {
 		return
 	}
