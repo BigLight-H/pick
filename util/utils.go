@@ -78,7 +78,6 @@ func MKdirs(path string) {
 
 func DownloadJpg(url string, file_name string, caches bool)  {
 	bs := Exists(beego.AppConfig.String("comic_hub") + file_name)
-	spew.Dump(bs)
 	if bs && !caches {
 		return
 	}
@@ -234,10 +233,8 @@ func GetLinks(pageDomain string) {
 				if num1, err1 := o.Update(&lists, "LastChapter", "Type"); err1 == nil {
 					//有更新改变字段值
 					if num1 == int64(1) {
-						u := orm.NewOrm()
-						up := models.Links{Id:lId}
-						up.Status = 1
-						if num2, err2 := u.Update(&lists, "Status"); err2 != nil {
+						lists.Status = 1
+						if num2, err2 := o.Update(&lists, "Status"); err2 != nil {
 							spew.Dump(num2)
 						}
 					}
