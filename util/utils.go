@@ -351,6 +351,8 @@ func ComicsCopy(domin string, rootId int) {
 			chapter.EpisodeThumbnail = ""
 			chapter.LastTime = s["ctime"]
 			chapter.Link = s["link"]
+			chapter.CreateTime = time.Now().Unix()
+			chapter.UpdateTime = time.Now().Unix()
 			//cId, _ := c.Insert(&chapter)
 			cId := 0
 

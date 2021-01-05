@@ -196,6 +196,8 @@ func Comics(domin string, rootId int, caches bool) {
 			chapter.EpisodeThumbnail = ""
 			chapter.LastTime = s["ctime"]
 			chapter.Link = s["link"]
+			chapter.CreateTime = time.Now().Unix()
+			chapter.UpdateTime = time.Now().Unix()
 			//cId, _ := c.Insert(&chapter)
 			cId := 0
 			//图片路径

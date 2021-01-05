@@ -9,6 +9,8 @@ type BookEpisode struct {
 	EpisodeImgtotal     int
 	LastTime   			string
 	Link   				string
+	CreateTime   		int64
+	UpdateTime   		int64
 }
 
 func (m *BookEpisode) TableName() string {
