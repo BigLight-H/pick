@@ -55,7 +55,7 @@ func (p * PickController) Collection() {
 		p.Ctx.WriteString("rootList is empty")
 		return
 	}
-	list := strings.Split(rootList, "\n")
+	list := strings.Split(rootList, ",")
 
 
 	all := int(len(list))
