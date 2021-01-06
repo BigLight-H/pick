@@ -49,6 +49,7 @@ func (p * PickController) Collection() {
 	if cacheId > 0 {
 		caches = true
 	}
+	spew.Dump(caches, cacheId)
 	//图书列表
 	rootList := p.GetString("list")
 	if rootList == "" {
