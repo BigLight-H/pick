@@ -12,8 +12,8 @@ func init()  {
 }
 
 func init() {
-    beego.Router("/", &controllers.MainController{},"get:Index")
-    beego.Router("/schedule", &controllers.MainController{},"post:Schedule")
+    //beego.Router("/", &controllers.MainController{},"get:Index")
+    //beego.Router("/schedule", &controllers.MainController{},"post:Schedule")
     beego.Router("/collection", &controllers.PickController{},"post:Collection")
     beego.Router("/lists", &controllers.PickController{},"post:Lists")
     beego.Router("/add/redis", &controllers.PickController{},"*:SaveRedis")
