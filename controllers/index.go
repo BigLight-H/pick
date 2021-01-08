@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"github.com/astaxie/beego"
+	"github.com/beego/beego/server/web"
 )
 
 type MainController struct {
-	beego.Controller
+	web.Controller
 }
 
 func (c *MainController) Index() {
