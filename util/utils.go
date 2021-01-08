@@ -2,8 +2,8 @@ package util
 
 import (
 	"fmt"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/client/orm"
+	"github.com/beego/beego/core/config"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/garyburd/redigo/redis"
 	"github.com/gocolly/colly"
@@ -70,14 +70,16 @@ func SumImgs(imgs string) (int, string)  {
 
 //建立指定目录
 func MKdirs(path string) {
-	ph := beego.AppConfig.String("comic_hub") + path
-	if _, err := os.Stat(ph); os.IsNotExist(err) {
-		os.Mkdir(ph, os.ModePerm)
+	ph, _ := config.String("comic_hub")
+	path_ := ph + path
+	if _, err := os.Stat(path_); os.IsNotExist(err) {
+		_ = os.Mkdir(path_, os.ModePerm)
 	}
 }
 
 func DownloadJpg(url string, file_name string, caches bool)  {
-	bs := Exists(beego.AppConfig.String("comic_hub") + file_name)
+	comicHub, _ := config.String("comic_hub")
+	bs := Exists(comicHub + file_name)
 	if bs && !caches {
 		return
 	}
@@ -109,7 +111,7 @@ func DownloadJpg(url string, file_name string, caches bool)  {
 		byteCotent, e := ioutil.ReadAll(resp.Body)
 		HandError(e)
 
-		ioutil.WriteFile(beego.AppConfig.String("comic_hub") + file_name, byteCotent, 0777)
+		_ = ioutil.WriteFile(comicHub+file_name, byteCotent, 0777)
 		spew.Dump("已下载图片链接"+url)
 	}
 }

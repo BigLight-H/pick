@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/astaxie/beego"
+	"github.com/beego/beego/core/config"
 	"github.com/garyburd/redigo/redis"
 )
 
@@ -11,7 +11,7 @@ func ConnectRedisPool() redis.Conn {
 		MaxActive:   0,
 		IdleTimeout: 0,
 		Dial: func() (redis.Conn, error) {
-			conn, err := redis.Dial("tcp", beego.AppConfig.String("redis_addr"))
+			conn, err := redis.Dial("tcp", RedisLink())
 			if err != nil {
 				return nil, err
 			}
@@ -23,6 +23,11 @@ func ConnectRedisPool() redis.Conn {
 }
 
 func ConnectRedis() redis.Conn {
-	conn, _ := redis.Dial("tcp", beego.AppConfig.String("redis_addr"))
+	conn, _ := redis.Dial("tcp", RedisLink())
 	return conn
+}
+
+func RedisLink() string {
+	redis_, _ := config.String("redis_addr")
+	return redis_
 }

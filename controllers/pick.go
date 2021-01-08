@@ -2,8 +2,9 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/client/orm"
+	"github.com/beego/beego/core/config"
+	"github.com/beego/beego/server/web"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/garyburd/redigo/redis"
 	"os"
@@ -18,7 +19,7 @@ import (
 )
 
 type PickController struct {
-	beego.Controller
+	web.Controller
 }
 
 //Json结构体
@@ -29,7 +30,7 @@ type Json struct {
 
 //获取全部书籍链接
 func (p *PickController) Lists() {
-	domain := beego.AppConfig.String("source_1")
+	domain, _ := config.String("source_1")
 	go util.BookLists(domain)
 	p.MsgBack("采集全部图书链接完成", 1)
 }

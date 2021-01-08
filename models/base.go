@@ -2,21 +2,22 @@ package models
 
 import (
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/client/orm"
+	"github.com/beego/beego/core/config"
 )
 
 //初始化数据库
 func Init() {
-	dbhost := beego.AppConfig.String("db_host")
-	dbport := beego.AppConfig.String("db_port")
-	dbuser := beego.AppConfig.String("db_user")
-	dbname := beego.AppConfig.String("db_name")
-	dbpwd  := beego.AppConfig.String("db_password")
+	dbhost, _ := config.String("db_host")
+	dbport, _ := config.String("db_port")
+	dbuser, _ := config.String("db_user")
+	dbname, _ := config.String("db_name")
+	dbpwd,  _ := config.String("db_password")
 	if dbport == "" {
 		dbport = "3306"
 	}
 	dsn := dbuser + ":" + dbpwd + "@tcp(" + dbhost + ":" + dbport + ")/" + dbname + "?charset=utf8&loc=Asia%2FShanghai"
-	orm.RegisterDataBase("default", "mysql", dsn)
+	_ = orm.RegisterDataBase("default", "mysql", dsn)
 	orm.RegisterModel(
 		new(Book),
 		new(Chapter),

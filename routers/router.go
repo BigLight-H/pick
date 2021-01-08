@@ -1,20 +1,14 @@
 package routers
 
 import (
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/server/web"
 	"pick/controllers"
-	"github.com/astaxie/beego"
 )
-
-func init()  {
-	orm.Debug = true
-	//models.Init()
-}
 
 func init() {
     //beego.Router("/", &controllers.MainController{},"get:Index")
     //beego.Router("/schedule", &controllers.MainController{},"post:Schedule")
-    beego.Router("/collection", &controllers.PickController{},"post:Collection")
-    beego.Router("/lists", &controllers.PickController{},"post:Lists")
-    beego.Router("/add/redis", &controllers.PickController{},"*:SaveRedis")
+    web.Router("/collection", &controllers.PickController{},"post:Collection")
+	web.Router("/lists", &controllers.PickController{},"post:Lists")
+	web.Router("/add/redis", &controllers.PickController{},"*:SaveRedis")
 }
