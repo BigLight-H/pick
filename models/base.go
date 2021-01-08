@@ -1,7 +1,6 @@
 package models
 
 import (
-	"github.com/astaxie/beego"
 	"github.com/beego/beego/client/orm"
 	"github.com/beego/beego/core/config"
 )
@@ -30,5 +29,6 @@ func Init() {
 
 //返回带前缀的表名
 func TableName(str string) string {
-	return beego.AppConfig.String("db_prifix") + str
+	prifix, _ := config.String("db_prifix")
+	return prifix + str
 }
