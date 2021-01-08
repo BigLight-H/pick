@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/beego/beego"
-	"github.com/beego/beego/orm"
-	"github.com/beego/beego/plugins/cors"
+	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
+	"github.com/astaxie/beego/plugins/cors"
 	_ "github.com/go-sql-driver/mysql"
 	"pick/models"
 	_ "pick/routers"

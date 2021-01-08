@@ -2,8 +2,8 @@ package util
 
 import (
 	"fmt"
-	"github.com/beego/beego"
-	"github.com/beego/beego/orm"
+	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/orm"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/garyburd/redigo/redis"
 	"github.com/gocolly/colly"
