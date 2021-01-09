@@ -30,8 +30,8 @@ type Json struct {
 
 //获取全部书籍链接
 func (p *PickController) Lists() {
-	domain, _ := config.String("source_root")
-	go util.BookLists(domain)
+	domain, _ := config.String("source_two")
+	service.WhereGo(domain)
 	p.MsgBack("采集全部图书链接完成", 1)
 }
 

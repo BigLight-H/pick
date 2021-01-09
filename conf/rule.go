@@ -41,6 +41,7 @@ type MainRule struct {
 	NCTime string //章节最新跟新时间
 }
 
+//源一章节XPATH规则
 func Choose(id int) *MainRule {
 	if id == 1 {
 		return &MainRule{
@@ -67,4 +68,5 @@ func Choose(id int) *MainRule {
 	}
 	return &MainRule{}
 }
+
 

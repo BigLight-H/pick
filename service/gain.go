@@ -1,4 +1,4 @@
-package util
+package service
 
 import (
 	"fmt"
@@ -8,170 +8,40 @@ import (
 	"github.com/garyburd/redigo/redis"
 	"github.com/gocolly/colly"
 	"io/ioutil"
-	"math/rand"
 	"net/http"
 	"os"
 	"pick/conf"
 	"pick/models"
-	"pick/service"
+	"pick/util"
 	"strconv"
 	"strings"
 	"time"
 )
 
-//建立图书目录
-func ThisMkdir(domin string) string {
-	pathArr := strings.SplitAfter(domin, "/")
-	ps := pathArr[len(pathArr)-1]
-	path := ""
-	if ps == "" {
-		ps = pathArr[len(pathArr)-2]
-		path = strings.TrimRight(ps, "/")
-	} else {
-		path = ps
-	}
-	MKdirs(path)
-	return path
-}
+/**
+ * 获取源二总页数
+ */
+func BookTwoLists(domain string) {
+	//图片信息
+	c := colly.NewCollector()
 
-//获取父子级目录名
-func GetSubdirectory(domin string) (string, string)  {
-	imgArr := strings.Split(domin, "/")
-	fater := imgArr[len(imgArr)-3]
-	son := imgArr[len(imgArr)-2]
-	return fater, son
-}
-
-
-func ChapterListOrder(chapterName string, str string, k int) string  {
-	chapterArr := strings.Split(chapterName, str)
-	var orderId string
-	orderId = chapterArr[len(chapterArr)-k]
-	return orderId
-}
-
-//获取章节排序
-func ChapterOrder(chapterName string, str string, k int) string  {
-	chapterArr := strings.Split(chapterName, str)
-	var orderId string
-	if len(chapterArr) > 2 {
-		orderId = chapterArr[len(chapterArr)-(k+1)]+"-"+chapterArr[len(chapterArr)-k]
-	} else {
-		orderId = chapterArr[len(chapterArr)-k]
-	}
-	return orderId
-}
-
-//计算图片张数
-func SumImgs(imgs string) (int, string)  {
-	chapterArr := strings.Split(imgs, ",")
-	return len(chapterArr), chapterArr[0]
-}
-
-//建立指定目录
-func MKdirs(path string) {
-	ph, _ := config.String("comic_hub")
-	path_ := ph + path
-	if _, err := os.Stat(path_); os.IsNotExist(err) {
-		_ = os.Mkdir(path_, os.ModePerm)
-	}
-}
-
-func DownloadJpg(url string, file_name string, caches bool)  {
-	comicHub, _ := config.String("comic_hub")
-	bs := Exists(comicHub + file_name)
-	if bs && !caches {
-		return
-	}
-	transport := &http.Transport{IdleConnTimeout: 0}
-	client := &http.Client{Transport: transport}
-	if url != "" {
-		req,err := http.NewRequest("GET",url,nil)
-		if err != nil{
-			fmt.Println(err)
-			return
+	// Find and visit all links
+	c.OnXML("//body/div[6]/div[1]/div[2]/div[1]/div[6]/ul[1]/li[7]", func(e *colly.XMLElement) {
+		lastLink := e.ChildText("//a")
+		spew.Dump(lastLink, domain)
+		os.Exit(1)
+		allNum, _ := strconv.Atoi(lastLink)
+		for i := 1; i <= allNum; i++ {
+			//获取分页数据并存入数据库
+			go util.GetLinks(domain + "page/" + strconv.Itoa(i) + "/")
 		}
-
-		req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36")
-		req.Header.Add("Referer","https://www.webtoon.xyz/")
-
-		req.Close = true
-
-		resp, er := client.Do(req)
-
-		if er != nil {
-			fmt.Println(er)
-			return
-		}
-		defer resp.Body.Close()
-		if resp.StatusCode != 200 {
-			fmt.Println(resp.StatusCode)
-			return
-		}
-		byteCotent, e := ioutil.ReadAll(resp.Body)
-		HandError(e)
-
-		_ = ioutil.WriteFile(comicHub+file_name, byteCotent, 0777)
-		spew.Dump("已下载图片链接"+url)
-	}
-}
-//判断文件是否存在
-func Exists(path string) bool {
-	_, err := os.Stat(path)    //os.Stat获取文件信息
-	if os.IsNotExist(err) {
-		return false
-	}
-	return true
+	})
+	c.Visit(domain)
 }
 
-
-func HandError(err error)  {
-	if err != nil{
-		fmt.Println("error",err)
-	}
-}
-
-func DoWork(dir string, imgs string, bid string, eid string, link string, caches bool) {
-	imgArr := strings.Split(imgs, ",")
-	//删除第最后一个元素
-	if len(imgArr) > 0 {
-		imgArr = imgArr[:len(imgArr)-1]
-		for _, value := range imgArr{
-			imgAr := strings.Split(value, "/")
-			name := imgAr[len(imgAr)-1]
-			go DownloadJpg(value, dir+"/"+bid+"0"+eid+name, caches)
-		}
-		//存储章节爬取记录
-		redisPool := models.ConnectRedisPool()
-		defer redisPool.Close()
-		_, err := redisPool.Do("HSET", "chapter_links", link, 1)
-		if err != nil {
-			spew.Dump("存入章节链接到redis错误")
-		}
-	}
-}
-
-//数组平分
-func SplitArray(arr []string, num int) ([][]string) {
-	max := int(len(arr))
-	if max < num {
-		return nil
-	}
-	var segmens =make([][]string,0)
-	quantity:=max/num
-	end:=int(0)
-	for i := int(1); i <= num; i++ {
-		qu:=i*quantity
-		if i != num {
-			segmens= append(segmens,arr[i-1+end:qu])
-		}else {
-			segmens= append(segmens,arr[i-1+end:])
-		}
-		end=qu-i
-	}
-	return segmens
-}
-
+/**
+ * 获取源一总页数
+ */
 func BookLists(domain string) {
 	//图片信息
 	c := colly.NewCollector()
@@ -179,7 +49,7 @@ func BookLists(domain string) {
 	// Find and visit all links
 	c.OnXML("//body/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/div[2]/div[1]/a[@class='last']", func(e *colly.XMLElement) {
 		lastLink := e.ChildText("//@href")
-		allPage := ChapterListOrder(lastLink, "/", 2)
+		allPage := util.ChapterListOrder(lastLink, "/", 2)
 		allNum, _ := strconv.Atoi(allPage)
 		for i := 1; i <= allNum; i++ {
 			//获取分页数据并存入数据库
@@ -189,8 +59,9 @@ func BookLists(domain string) {
 	c.Visit(domain)
 }
 
-
-
+/**
+ * 获取源一链接
+ */
 func GetLinks(pageDomain string) {
 	d := colly.NewCollector()
 	//var wg sync.WaitGroup
@@ -252,23 +123,12 @@ func GetLinks(pageDomain string) {
 	//wg.Wait()
 }
 
-// 随机数字串
-func RandomNum(length int) string {
-	result := ""
-	rand.Seed(time.Now().UnixNano())
-	for i := 0; i < length; i++ {
-		num := rand.Intn(10)
-		result = result + strconv.Itoa(num)
-	}
-	return result
-}
-
 //操作图书
 func ComicsCopy(domin string, rootId int) {
 	//获取指定规则
 	role := conf.Choose(rootId)
 	//爬取图书
-	bookInfo, chapterInfo := service.BookInfo(role, domin, false)
+	bookInfo, chapterInfo := BookInfo(role, domin, false)
 	//图书ID
 	bId := 0
 	o := orm.NewOrm()
@@ -283,7 +143,7 @@ func ComicsCopy(domin string, rootId int) {
 			book.DomainName = domin
 			book.BookTitle = v["name"]
 			book.BookTags = v["tags"]
-			book.BookProfile = SubString(v["intro"], 0, 300)
+			book.BookProfile = util.SubString(v["intro"], 0, 300)
 			book.BookStat = 0
 			if v["status"] == "Completed" {
 				book.BookStat = 1
@@ -294,12 +154,12 @@ func ComicsCopy(domin string, rootId int) {
 			book.Star = v["star"]
 			book.Year = v["year"]
 			book.LastTime = v["ltime"]
-			book.TimesCollect = RandomNum(4)
-			book.TimesBuy = RandomNum(4)
-			book.TimesRead = RandomNum(4)
-			book.TimesSubscribed = RandomNum(4)
-			book.UserBuy = RandomNum(4)
-			book.UserRead = RandomNum(4)
+			book.TimesCollect = util.RandomNum(4)
+			book.TimesBuy = util.RandomNum(4)
+			book.TimesRead = util.RandomNum(4)
+			book.TimesSubscribed = util.RandomNum(4)
+			book.UserBuy = util.RandomNum(4)
+			book.UserRead = util.RandomNum(4)
 			book.BookThumbnail = ""
 			book.IsAgeLimit = 1
 			book.Status = 0
@@ -314,7 +174,7 @@ func ComicsCopy(domin string, rootId int) {
 				num, _ := o.Update(&up, "BookThumbnail")
 				if num > int64(0) {
 					//新建文件目录
-					MKdirs(bookid)
+					util.MKdirs(bookid)
 					//下载封面图片到目录
 					DownloadJpg(v["image"], bookid+"/"+bookid+"_thumb.jpg", false)
 				}
@@ -341,15 +201,15 @@ func ComicsCopy(domin string, rootId int) {
 	if bId > 0 {
 		for _, s := range chapterInfo {
 			//切割链接
-			_, son := GetSubdirectory(s["link"])
-			epid := ChapterOrder(son, "-", 1)
+			_, son := util.GetSubdirectory(s["link"])
+			epid := util.ChapterOrder(son, "-", 1)
 			//存入章节表
 			c := orm.NewOrm()
 			chapter := models.BookEpisode{}
 			chapter.BookId = bId
 			chapter.EpisodeTitle = s["title"]
 			chapter.EpisodeId = epid
-			imgLen, fImg := SumImgs(s["imgs"])
+			imgLen, fImg := util.SumImgs(s["imgs"])
 			chapter.EpisodeImgtotal = imgLen
 			chapter.EpisodeThumbnail = ""
 			chapter.LastTime = s["ctime"]
@@ -371,7 +231,7 @@ func ComicsCopy(domin string, rootId int) {
 						num, _ := c.Update(&upimg, "EpisodeThumbnail")
 						if num > int64(0) {
 							//创建章节目录
-							MKdirs(bookid + "/" + epid)
+							util.MKdirs(bookid + "/" + epid)
 							//下载章节首张图片
 							DownloadJpg(fImg, imgRole, false)
 							//下载图片
@@ -399,44 +259,61 @@ func ComicsCopy(domin string, rootId int) {
 	}
 }
 
-//截取指定长度的字符串
-func SubString(source string, start int, end int) string {
-	var r = []rune(source)
-	length := len(r)
-
-	if start < 0 || end > length || start > end {
-		return ""
+func DownloadJpg(url string, file_name string, caches bool)  {
+	comicHub, _ := config.String("comic_hub")
+	bs := util.Exists(comicHub + file_name)
+	if bs && !caches {
+		return
 	}
+	transport := &http.Transport{IdleConnTimeout: 0}
+	client := &http.Client{Transport: transport}
+	if url != "" {
+		req,err := http.NewRequest("GET",url,nil)
+		if err != nil{
+			fmt.Println(err)
+			return
+		}
 
-	if start == 0 && end == length {
-		return source
+		req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36")
+		req.Header.Add("Referer","https://www.webtoon.xyz/")
+
+		req.Close = true
+
+		resp, er := client.Do(req)
+
+		if er != nil {
+			fmt.Println(er)
+			return
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != 200 {
+			fmt.Println(resp.StatusCode)
+			return
+		}
+		byteCotent, e := ioutil.ReadAll(resp.Body)
+		util.HandError(e)
+
+		_ = ioutil.WriteFile(comicHub+file_name, byteCotent, 0777)
+		spew.Dump("已下载图片链接"+url)
 	}
-
-	return string(r[start : end])
 }
 
-//增加进程数
-func AddProcessNum() {
-	redisPool := models.ConnectRedisPool()
-	defer redisPool.Close()
-	_, err2 := redisPool.Do("incr", "process-nums", 1)
-	if err2 != nil {
-		spew.Dump("增加进程数值错误")
-	}
-	val, err := redisPool.Do("get", "process-nums")
-	num, _ := redis.Int(val, err)
-	if num < 0 {
-		//重置
-		_, _ = redisPool.Do("set", "process-nums", 1)
-	}
-}
-
-//减去进程数
-func MinusProcessNum() {
-	redisPool := models.ConnectRedisPool()
-	defer redisPool.Close()
-	_, err2 := redisPool.Do("incr", "process-nums", 1)
-	if err2 != nil {
-		spew.Dump("增加完成数值错误")
+func DoWork(dir string, imgs string, bid string, eid string, link string, caches bool) {
+	imgArr := strings.Split(imgs, ",")
+	//删除第最后一个元素
+	if len(imgArr) > 0 {
+		imgArr = imgArr[:len(imgArr)-1]
+		for _, value := range imgArr{
+			imgAr := strings.Split(value, "/")
+			name := imgAr[len(imgAr)-1]
+			go DownloadJpg(value, dir+"/"+bid+"0"+eid+name, caches)
+		}
+		//存储章节爬取记录
+		redisPool := models.ConnectRedisPool()
+		defer redisPool.Close()
+		_, err := redisPool.Do("HSET", "chapter_links", link, 1)
+		if err != nil {
+			spew.Dump("存入章节链接到redis错误")
+		}
 	}
 }
