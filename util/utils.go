@@ -170,9 +170,7 @@ func GetKeys(domain string) int {
 	// 数组默认长度为map长度,后面append时,不需要重新申请内存和拷贝,效率较高
 	j := 1
 	keys := 0
-	spew.Dump(RootLinks)
 	for k := range RootLinks {
-		spew.Dump(domain+"------"+RootLinks[j])
 		if domain == RootLinks[j] {
 			keys = k
 		}
