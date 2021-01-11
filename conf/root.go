@@ -1,6 +1,9 @@
 package conf
 
-import "github.com/beego/beego/core/config"
+import (
+	"github.com/beego/beego/core/config"
+	"github.com/davecgh/go-spew/spew"
+)
 
 //源信息
 var RootLinks map[int]string
@@ -17,6 +20,7 @@ func GetKeys(domain string) int {
 	j := 1
 	keys := 0
 	for k := range RootLinks {
+		spew.Dump(domain+"------"+RootLinks[j])
 		if domain == RootLinks[j] {
 			keys = k
 		}
