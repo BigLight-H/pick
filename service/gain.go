@@ -27,7 +27,7 @@ func BookTwoLists(domain string) {
 
 	// Find and visit all links
 	c.OnXML("//body/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[3]/div[1]/span[1]", func(e *colly.XMLElement) {
-		lastLink := e.ChildText("./font")
+		lastLink := e.ChildText("//font")
 		spew.Dump(lastLink, domain)
 		os.Exit(1)
 		allNum, _ := strconv.Atoi(lastLink)
