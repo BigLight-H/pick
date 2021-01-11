@@ -9,7 +9,6 @@ import (
 	"github.com/gocolly/colly"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"pick/conf"
 	"pick/models"
 	"pick/util"
@@ -28,8 +27,6 @@ func BookTwoLists(domain string) {
 	// Find and visit all links
 	c.OnXML("//body/div[6]/div[1]/div[2]/div[1]/div[6]/ul[1]/li[7]", func(e *colly.XMLElement) {
 		lastLink := e.ChildText("//a")
-		spew.Dump(lastLink, domain)
-		os.Exit(1)
 		allNum, _ := strconv.Atoi(lastLink)
 		for i := 1; i <= allNum; i++ {
 			//获取分页数据并存入数据库
@@ -62,19 +59,32 @@ func BookLists(domain string) {
 /**
  * 获取源一链接
  */
-func GetLinks(pageDomain string) {
+func GetLinks(pageDomain string, rid int) {
 	d := colly.NewCollector()
 	//var wg sync.WaitGroup
+	switch rid {
+		case 1:
+			onePickLinks(d)
+			break
+		case 2:
+			break
+	}
+
+	d.Visit(pageDomain)
+	//wg.Wait()
+}
+
+func onePickLinks(d *colly.Collector) {
 	d.OnXML("//body/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/div[1]/div", func(f *colly.XMLElement) {
 		for a := 1; a <= 2; a++ {
 			//链接redis
 			redisPool := models.ConnectRedisPool()
 			defer redisPool.Close()
-			link := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[1]/a/@href")
-			title := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[1]/a/@title")
-			lastCharpter := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[2]/div[3]/div[1]/span[1]")
-			t1 := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[1]/a[1]/span[1]")
-			t2 := f.ChildText("//div[1]/div["+strconv.Itoa(a)+"]/div[1]/div[1]/a[1]/span[2]")
+			link := f.ChildText("//div[1]/div[" + strconv.Itoa(a) + "]/div[1]/div[1]/a/@href")
+			title := f.ChildText("//div[1]/div[" + strconv.Itoa(a) + "]/div[1]/div[1]/a/@title")
+			lastCharpter := f.ChildText("//div[1]/div[" + strconv.Itoa(a) + "]/div[1]/div[2]/div[3]/div[1]/span[1]")
+			t1 := f.ChildText("//div[1]/div[" + strconv.Itoa(a) + "]/div[1]/div[1]/a[1]/span[1]")
+			t2 := f.ChildText("//div[1]/div[" + strconv.Itoa(a) + "]/div[1]/div[1]/a[1]/span[2]")
 			isExist, _ := redisPool.Do("HEXISTS", "book_all_lists", link)
 			spew.Dump(link)
 			//创建协程
@@ -86,7 +96,7 @@ func GetLinks(pageDomain string) {
 					lists.BookName = title
 					lists.LastChapter = lastCharpter
 					lists.Status = 0
-					lists.Type = t1+","+t2
+					lists.Type = t1 + "," + t2
 					lid, err := o.Insert(&lists)
 					if err == nil {
 						_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
@@ -101,9 +111,9 @@ func GetLinks(pageDomain string) {
 				lId, _ := redis.Int(lid, err)
 				//查看更新
 				o := orm.NewOrm()
-				lists := models.Links{Id:lId}
+				lists := models.Links{Id: lId}
 				lists.LastChapter = lastCharpter
-				lists.Type = t1+","+t2
+				lists.Type = t1 + "," + t2
 				if num1, err1 := o.Update(&lists, "LastChapter", "Type"); err1 == nil {
 					//有更新改变字段值
 					if num1 == int64(1) {
@@ -119,8 +129,35 @@ func GetLinks(pageDomain string) {
 		}
 		//os.Exit(2)
 	})
-	d.Visit(pageDomain)
-	//wg.Wait()
+}
+
+func twoPickLinks(d *colly.Collector) {
+	d.OnXML("//body/div[6]/div[1]/div[2]/div[1]/div[5]/div", func(f *colly.XMLElement) {
+		link := f.ChildText("//div[1]/a[1]/@href")
+		title := f.ChildText("//div[1]/div[1]/h3[1]/a/text()")
+		lastCharpter := f.ChildText("//div[1]/div[1]/a/text()")
+		t1 := f.ChildText("/div[1]/div[1]/small[1]/a[1]/text()")
+		t2 := ""
+		if link != "" {
+			o := orm.NewOrm()
+			lists := models.Links{}
+			lists.BookLink = link
+			lists.BookName = title
+			lists.LastChapter = lastCharpter
+			lists.Status = 0
+			lists.Type = t1 + "," + t2
+			lid, err := o.Insert(&lists)
+			if err == nil {
+				spew.Dump(lid)
+				//_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
+				//if err2 != nil {
+				//	spew.Dump("漫画链接存入错误")
+				//}
+				//go ComicsCopy(link, 1)
+			}
+		}
+
+	})
 }
 
 //操作图书
