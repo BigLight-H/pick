@@ -26,14 +26,14 @@ func BookTwoLists(domain string) {
 	c := colly.NewCollector()
 
 	// Find and visit all links
-	c.OnXML("//header/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/a[1]", func(e *colly.XMLElement) {
-		lastLink := e.ChildText("//img[1]/@href")
+	c.OnXML("//body/div[6]/div[1]/div[2]/div[1]/div[6]/ul[1]/li[7]", func(e *colly.XMLElement) {
+		lastLink := e.ChildText("//a")
 		spew.Dump(lastLink, domain)
 		os.Exit(1)
 		allNum, _ := strconv.Atoi(lastLink)
 		for i := 1; i <= allNum; i++ {
 			//获取分页数据并存入数据库
-			go GetLinks(domain + "page/" + strconv.Itoa(i) + "/")
+			go GetLinks(domain + "page=" + strconv.Itoa(i) + "")
 		}
 	})
 	c.Visit(domain)
