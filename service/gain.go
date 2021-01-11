@@ -9,6 +9,7 @@ import (
 	"github.com/gocolly/colly"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"pick/conf"
 	"pick/models"
 	"pick/util"
@@ -20,7 +21,7 @@ import (
 /**
  * 获取源二总页数
  */
-func BookTwoLists(domain string) {
+func BookTwoLists(domain string, rid int) {
 	//图片信息
 	c := colly.NewCollector()
 
@@ -30,7 +31,7 @@ func BookTwoLists(domain string) {
 		allNum, _ := strconv.Atoi(lastLink)
 		for i := 1; i <= allNum; i++ {
 			//获取分页数据并存入数据库
-			go GetLinks(domain + "page=" + strconv.Itoa(i) + "")
+			go GetLinks(domain + "page=" + strconv.Itoa(i) + "", rid)
 		}
 	})
 	c.Visit(domain)
@@ -39,7 +40,7 @@ func BookTwoLists(domain string) {
 /**
  * 获取源一总页数
  */
-func BookLists(domain string) {
+func BookLists(domain string, rid int) {
 	//图片信息
 	c := colly.NewCollector()
 
@@ -50,7 +51,7 @@ func BookLists(domain string) {
 		allNum, _ := strconv.Atoi(allPage)
 		for i := 1; i <= allNum; i++ {
 			//获取分页数据并存入数据库
-			go GetLinks(domain + "page/" + strconv.Itoa(i) + "/")
+			go GetLinks(domain + "page/" + strconv.Itoa(i) + "/", )
 		}
 	})
 	c.Visit(domain)
@@ -67,6 +68,7 @@ func GetLinks(pageDomain string, rid int) {
 			onePickLinks(d)
 			break
 		case 2:
+			onePickLinks(d)
 			break
 	}
 
@@ -149,6 +151,7 @@ func twoPickLinks(d *colly.Collector) {
 			lid, err := o.Insert(&lists)
 			if err == nil {
 				spew.Dump(lid)
+				os.Exit(1)
 				//_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
 				//if err2 != nil {
 				//	spew.Dump("漫画链接存入错误")

@@ -11,10 +11,10 @@ func WhereGo(domain string)  {
 	spew.Dump(rid)
 	switch rid {
 		case 1:
-			BookLists(domain)
+			BookLists(domain, rid)
 			break
 		case 2:
-			BookTwoLists(domain)
+			BookTwoLists(domain, rid)
 			break
 	}
 }
