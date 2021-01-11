@@ -51,7 +51,7 @@ func BookLists(domain string, rid int) {
 		allNum, _ := strconv.Atoi(allPage)
 		for i := 1; i <= allNum; i++ {
 			//获取分页数据并存入数据库
-			go GetLinks(domain + "page/" + strconv.Itoa(i) + "/", )
+			go GetLinks(domain + "page/" + strconv.Itoa(i) + "/", rid)
 		}
 	})
 	c.Visit(domain)
@@ -68,7 +68,7 @@ func GetLinks(pageDomain string, rid int) {
 			onePickLinks(d)
 			break
 		case 2:
-			onePickLinks(d)
+			twoPickLinks(d)
 			break
 	}
 
