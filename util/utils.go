@@ -163,8 +163,8 @@ func MinusProcessNum() {
 
 func GetKeys(domain string) int {
 	RootLinks := make(map[int]string)
-	sone, _ := config.String("source_root")
-	stwo, _ := config.String("source_root")
+	sone, _ := config.String("source_one")
+	stwo, _ := config.String("source_two")
 	RootLinks[1] = sone
 	RootLinks[2] = stwo
 	// 数组默认长度为map长度,后面append时,不需要重新申请内存和拷贝,效率较高
