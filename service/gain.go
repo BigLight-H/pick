@@ -33,7 +33,7 @@ func BookTwoLists(domain string) {
 		allNum, _ := strconv.Atoi(lastLink)
 		for i := 1; i <= allNum; i++ {
 			//获取分页数据并存入数据库
-			go util.GetLinks(domain + "page/" + strconv.Itoa(i) + "/")
+			go GetLinks(domain + "page/" + strconv.Itoa(i) + "/")
 		}
 	})
 	c.Visit(domain)
