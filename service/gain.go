@@ -189,7 +189,7 @@ func twoPickLinks(d *colly.Collector) {
 					//go ComicsCopy(link, 1)
 				}
 			} else {//存在
-				go ComicsCopy(link, 2)
+				ComicsCopy(link, 2)
 			}
 		}
 
