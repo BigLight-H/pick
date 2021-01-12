@@ -9,7 +9,6 @@ import (
 	"github.com/gocolly/colly"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"pick/conf"
 	"pick/models"
 	"pick/util"
@@ -162,29 +161,31 @@ func onePickLinks(d *colly.Collector) {
 func twoPickLinks(d *colly.Collector) {
 	d.OnXML("//body/div[6]/div[1]/div[2]/div[1]/div[5]/div", func(f *colly.XMLElement) {
 		link := f.ChildText("./div[1]/a[1]/@href")
-		title := f.ChildText("./div[1]/div[1]/h3[1]/a/text()")
+		title := f.ChildText("./div[1]/div[1]/h3[1]/a")
 		lastCharpter := f.ChildText("./div[1]/div[1]/a")
-		t1 := f.ChildText("./div[1]/div[1]/small[1]/a[1]/text()")
+		t1 := f.ChildText("./div[1]/div[1]/small[1]/a[1]")
 		t2 := ""
 		if link != "" {
 			o := orm.NewOrm()
 			lists := models.Links{}
-			lists.BookLink = link
-			lists.BookName = title
-			lists.LastChapter = lastCharpter
-			lists.Status = 0
-			lists.Type = t1 + "," + t2
-			lists.Source = 2
-			lists.ChapterNum = util.GetNumber(lastCharpter)
-			lid, err := o.Insert(&lists)
-			if err == nil {
-				spew.Dump(lid)
-				os.Exit(1)
-				//_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
-				//if err2 != nil {
-				//	spew.Dump("漫画链接存入错误")
-				//}
-				//go ComicsCopy(link, 1)
+			err := o.QueryTable("book_links").Filter("book_name", title).One(&lists)
+			if err == orm.ErrNoRows {
+				lists.BookLink = link
+				lists.BookName = title
+				lists.LastChapter = lastCharpter
+				lists.Status = 0
+				lists.Type = t1 + "," + t2
+				lists.Source = 2
+				lists.ChapterNum = util.GetNumber(lastCharpter)
+				lid, err := o.Insert(&lists)
+				if err == nil {
+					spew.Dump(lid)
+					//_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
+					//if err2 != nil {
+					//	spew.Dump("漫画链接存入错误")
+					//}
+					//go ComicsCopy(link, 1)
+				}
 			}
 		}
 
