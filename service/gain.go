@@ -124,7 +124,7 @@ func onePickLinks(d *colly.Collector) {
 					lists.Status = 0
 					lists.Type = t1 + "," + t2
 					lists.Source = 1
-					lists.ChapterNum = util.ChapterListOrder(lastCharpter, " ", 1)
+					lists.ChapterNum = util.GetNumber(lastCharpter)
 					lid, err := o.Insert(&lists)
 					if err == nil {
 						_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
@@ -175,7 +175,7 @@ func twoPickLinks(d *colly.Collector) {
 			lists.Status = 0
 			lists.Type = t1 + "," + t2
 			lists.Source = 2
-			lists.ChapterNum = lastCharpter
+			lists.ChapterNum = util.GetNumber(lastCharpter)
 			lid, err := o.Insert(&lists)
 			if err == nil {
 				spew.Dump(lid)
@@ -208,7 +208,7 @@ func threePickLinks(d *colly.Collector) {
 				lists.Status = 0
 				lists.Type = t1 + "," + t2
 				lists.Source = 3
-				lists.ChapterNum = util.ChapterListOrder(lastCharpter, " ", 1)
+				lists.ChapterNum = util.GetNumber(lastCharpter)
 				lid, err := o.Insert(&lists)
 				if err == nil {
 					spew.Dump(lid)

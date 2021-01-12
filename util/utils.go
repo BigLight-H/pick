@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"os"
 	"pick/models"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -170,8 +171,8 @@ func GetKeys(domain string, number int) int {
 	// 数组默认长度为map长度,后面append时,不需要重新申请内存和拷贝,效率较高
 	j := 1
 	keys := 0
-	for k := range RootLinks {
-		if strings.Compare(domain, RootLinks[j]) == 0 {
+	for k, val := range RootLinks {
+		if domain == val {
 			keys = k
 			continue
 		}
@@ -180,7 +181,16 @@ func GetKeys(domain string, number int) int {
 	return keys
 }
 
+//字符串转数字int
 func StrToInt(str string) int {
 	number, _ := strconv.Atoi(str)
 	return number
+}
+
+//获取字符串中的数字并将数组转字符串使用.号分隔
+func GetNumber(str string) string {
+	re := regexp.MustCompile("[0-9]+")
+	strArray := re.FindAllString(str, -1)
+	newStr := strings.Join(strArray,".")
+	return newStr
 }
