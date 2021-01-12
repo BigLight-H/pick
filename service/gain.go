@@ -188,32 +188,33 @@ func twoPickLinks(d *colly.Collector) {
 }
 
 func threePickLinks(d *colly.Collector) {
-	d.OnXML("//body/div[6]/div[1]/div[2]/div[1]/div[5]/div", func(f *colly.XMLElement) {
-		link := f.ChildText("./div[1]/a[1]/@href")
-		title := f.ChildText("./div[1]/div[1]/h3[1]/a/text()")
-		lastCharpter := f.ChildText("./div[1]/div[1]/a")
-		t1 := f.ChildText("./div[1]/div[1]/small[1]/a[1]/text()")
-		t2 := ""
-		if link != "" {
-			o := orm.NewOrm()
-			lists := models.Links{}
-			lists.BookLink = link
-			lists.BookName = title
-			lists.LastChapter = lastCharpter
-			lists.Status = 0
-			lists.Type = t1 + "," + t2
-			lid, err := o.Insert(&lists)
-			if err == nil {
-				spew.Dump(lid)
-				os.Exit(1)
-				//_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
-				//if err2 != nil {
-				//	spew.Dump("漫画链接存入错误")
-				//}
-				//go ComicsCopy(link, 1)
+	d.OnXML("//div[@id='loop-content']", func(f *colly.XMLElement) {
+		for a := 1; a <= 2; a++ {
+			link := f.ChildText("./div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/h3[1]/a[1]/@href")
+			title := f.ChildText("./div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/h3[1]/a[1]")
+			lastCharpter := f.ChildText("./div[1]/div[1]/div[1]/div[1]/div[2]/div[3]/div[1]/span[1]/a[1]")
+			t1 := ""
+			t2 := ""
+			if link != "" {
+				o := orm.NewOrm()
+				lists := models.Links{}
+				lists.BookLink = link
+				lists.BookName = title
+				lists.LastChapter = lastCharpter
+				lists.Status = 0
+				lists.Type = t1 + "," + t2
+				lid, err := o.Insert(&lists)
+				if err == nil {
+					spew.Dump(lid)
+					os.Exit(1)
+					//_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
+					//if err2 != nil {
+					//	spew.Dump("漫画链接存入错误")
+					//}
+					//go ComicsCopy(link, 1)
+				}
 			}
 		}
-
 	})
 }
 
