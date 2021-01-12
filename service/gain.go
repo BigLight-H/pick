@@ -47,9 +47,9 @@ func BookThreeLists(domain string, rid int) {
 	// Find and visit all links
 	c.OnXML("//body/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[3]/div[1]", func(e *colly.XMLElement) {
 		lastLink := e.ChildText("./span[1]")
-		util.ChapterListOrder(lastLink, " ", 1)
-		allNum, _ := strconv.Atoi(lastLink)
-		spew.Dump(allNum)
+		allPage := util.ChapterListOrder(lastLink, " ", 1)
+		allNum, _ := strconv.Atoi(allPage)
+		spew.Dump(allNum,allPage)
 		os.Exit(1)
 		for i := 1; i <= allNum; i++ {
 			//获取分页数据并存入数据库
