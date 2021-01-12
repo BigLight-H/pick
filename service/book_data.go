@@ -20,7 +20,7 @@ func BookInfo(role *conf.MainRule, domin string, caches bool, rootId int) ([]map
 	//链接redis
 	redisPool := models.ConnectRedisPool()
 	defer redisPool.Close()
-	spew.Dump(domin)
+	spew.Dump(domin,role.Table)
 	c.OnXML(role.Table, func(e *colly.XMLElement) {
 		//章节名
 		title := e.ChildText(role.Title)
@@ -28,19 +28,20 @@ func BookInfo(role *conf.MainRule, domin string, caches bool, rootId int) ([]map
 		//util.MKdirs(dir+"\\"+title)
 		//章节链接
 		link := util.GetLinkPrefix(rootId)+e.ChildText(role.Link)
-		//isExist, _ := redisPool.Do("HEXISTS", "chapter_links", link)
-		////章节链接不存在redis里面采集
-		//if isExist != int64(1) || caches {
+		isExist, _ := redisPool.Do("HEXISTS", "chapter_links", link)
+		//章节链接不存在redis里面采集
+		if isExist != int64(1) || caches {
 			//章节更新时间
 			ctime := e.ChildText(role.CTime)
 			if ctime == "" {
 				ctime = e.ChildText(role.NCTime)
 			}
 			img := GetDetail(role, link)
+			spew.Dump(role.Table)
 			chapterInfo = append(
 				chapterInfo,
 				map[string]string{"link": link, "title": title, "imgs": img, "ctime":ctime})
-		//}
+		}
 	})
 	c.OnXML(role.Body, func(e *colly.XMLElement) {
 		//图书名
