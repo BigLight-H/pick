@@ -8,7 +8,7 @@ import (
 //根据链接转发源
 func WhereGo(domain string, num int)  {
 	rid := util.GetKeys(domain, num)
-	spew.Dump(rid)
+	spew.Dump(rid, domain)
 	switch rid {
 		case 1:
 			BookLists(domain, rid)
