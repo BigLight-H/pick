@@ -27,7 +27,6 @@ func BookInfo(role *conf.MainRule, domin string, caches bool) ([]map[string]stri
 		//util.MKdirs(dir+"\\"+title)
 		//章节链接
 		link := e.ChildText(role.Link)
-		spew.Dump(title, link)
 		isExist, _ := redisPool.Do("HEXISTS", "chapter_links", link)
 		//章节链接不存在redis里面采集
 		if isExist != int64(1) || caches {
@@ -78,11 +77,9 @@ func BookInfo(role *conf.MainRule, domin string, caches bool) ([]map[string]stri
 func GetDetail(role *conf.MainRule, domin string) string {
 	cs := colly.NewCollector()
 	var img string
-	spew.Dump(domin,role.Detail)
 	cs.OnXML(role.Detail, func(e *colly.XMLElement) {
 		//章节链接
 		imgLink := e.ChildText(role.ImgSrc)
-		spew.Dump(domin,imgLink)
 		//存入指定图片目录
 		//imgArr := strings.Split(imgLink, "/")
 		//name := imgArr[len(imgArr)-1]
