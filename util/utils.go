@@ -194,3 +194,8 @@ func GetNumber(str string) string {
 	newStr := strings.Join(strArray,".")
 	return newStr
 }
+
+//字符串首字母大写
+func StrFirstToBig(str string) string {
+	return strings.ToTitle(strings.ToLower(str))
+}

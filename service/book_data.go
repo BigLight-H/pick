@@ -20,11 +20,11 @@ func BookInfo(role *conf.MainRule, domin string, caches bool) ([]map[string]stri
 	defer redisPool.Close()
 	c.OnXML(role.Table, func(e *colly.XMLElement) {
 		//章节名
-		title := e.ChildText(role.Link)
+		title := e.ChildText(role.Title)
 		//创建章节目录
 		//util.MKdirs(dir+"\\"+title)
 		//章节链接
-		link := e.ChildText(role.Title)
+		link := e.ChildText(role.Link)
 		isExist, _ := redisPool.Do("HEXISTS", "chapter_links", link)
 		//章节链接不存在redis里面采集
 		if isExist != int64(1) || caches {

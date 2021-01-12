@@ -43,28 +43,53 @@ type MainRule struct {
 
 //源一章节XPATH规则
 func Choose(id int) *MainRule {
-	if id == 1 {
-		return &MainRule{
-			Table:   "//body/div[1]/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[4]/div[1]/ul[1]/li",
-			Body :   "//body",
-			Name :   "//div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/ol[1]/li[3]",
-			Year :   "//div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[2]/div[1]/div[2]/div[1]/div[2]/a[1]",
-			Star :   "//div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[2]/div[1]/div[1]/div[2]/div[1]/span[1]",
-			Author : "//div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[2]/div[1]/div[1]/div[6]/div[2]/div[1]/a[1]",
-			Tags :   "//div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[2]/div[1]/div[1]/div[8]/div[2]/div[1]",
-			Status : "//div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[2]/div[1]/div[2]/div[2]/div[2]",
-			Intro :  "//div[1]/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/p[2]",
-			Types :  "//div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/h1[1]/span[1]",
-			Image :  "//div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/a[1]/img[1]/@data-src",
-			Title :  "//a[1]/@href",
-			Link : "//a[1]/text()",
-			Detail : "//body/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[2]/div[position()<last()]",
-			ImgSrc : "//img/@data-src",
-			LTime : "//div[1]/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[4]/div[1]/ul[1]/li[1]/span",
-			CTime : "//span",
-			NTime : "//div[1]/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[4]/div[1]/ul[1]/li[1]/span[1]/span[1]/a[1]/img[1]/@alt",
-			NCTime : "//span[1]/span[1]/a[1]/img[1]/@alt",
-		}
+	switch id {
+		case 1:
+			return &MainRule{
+				Table:   "//body/div[1]/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[4]/div[1]/ul[1]/li",
+				Body :   "//body",
+				Name :   "//div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/ol[1]/li[3]",
+				Year :   "//div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[2]/div[1]/div[2]/div[1]/div[2]/a[1]",
+				Star :   "//div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[2]/div[1]/div[1]/div[2]/div[1]/span[1]",
+				Author : "//div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[2]/div[1]/div[1]/div[6]/div[2]/div[1]/a[1]",
+				Tags :   "//div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[2]/div[1]/div[1]/div[8]/div[2]/div[1]",
+				Status : "//div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[2]/div[1]/div[2]/div[2]/div[2]",
+				Intro :  "//div[1]/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/p[2]",
+				Types :  "//div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/h1[1]/span[1]",
+				Image :  "//div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[1]/a[1]/img[1]/@data-src",
+				Title :  "//a[1]/text()",
+				Link : "//a[1]/@href",
+				Detail : "//body/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[2]/div[position()<last()]",
+				ImgSrc : "//img/@data-src",
+				LTime : "//div[1]/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[4]/div[1]/ul[1]/li[1]/span",
+				CTime : "//span",
+				NTime : "//div[1]/div[1]/div[2]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[4]/div[1]/ul[1]/li[1]/span[1]/span[1]/a[1]/img[1]/@alt",
+				NCTime : "//span[1]/span[1]/a[1]/img[1]/@alt",
+			}
+		case 2:
+			return &MainRule{
+				Table:   "//div[@id='list-chapters']/p",
+				Body :   "//body/div[6]/div[1]/div[1]/div[1]",
+				Name :   "//body/div[6]/div[1]/ol[1]/li[3]/a[1]/span",
+				Year :   "./div[2]/ul[1]/i",
+				Star :   "//div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/div[2]/div[1]/div[1]/div[2]/div[1]/span[1]",
+				Author : "./div[2]/ul[1]/li[2]/small[1]",
+				Tags :   "./div[2]/ul[1]/li[3]/small[1]",
+				Status : "./div[2]/ul[1]/li[4]/a[1]",
+				Intro :  " //body/div[6]/div[1]/div[1]/div[2]/div[1]/div[2]/text()",
+				Types :  "//div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/h1[1]/span[1]",
+				Image :  "./div[1]/img[1]/@src",
+				Title :  "./span[1]/a/@href",
+				Link  :  "./span[1]/a/@title",
+				Detail : "//article[@id='content']/img",
+				ImgSrc : "./@data-original",
+				LTime : "//body/div[6]/div[1]/div[1]/div[3]/div[1]/p[1]/span[2]/i[1]/time[1]",
+				CTime : "./span[2]/i[1]/time",
+				NTime : "//body/div[6]/div[1]/div[1]/div[3]/div[1]/p[2]/span[2]/i[1]/time[1]",
+				NCTime : "//span[1]/span[1]/a[1]/img[1]/@alt",
+			}
+		case 3:
+			break
 	}
 	return &MainRule{}
 }

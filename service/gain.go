@@ -9,6 +9,7 @@ import (
 	"github.com/gocolly/colly"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"pick/conf"
 	"pick/models"
 	"pick/util"
@@ -169,7 +170,7 @@ func twoPickLinks(d *colly.Collector) {
 			o := orm.NewOrm()
 			lists := models.Links{}
 			err := o.QueryTable("book_links").Filter("book_name", title).One(&lists)
-			if err == orm.ErrNoRows {
+			if err == orm.ErrNoRows {//不存在
 				lists.BookLink = "https://manhwasmut.com/"+link
 				lists.BookName = title
 				lists.LastChapter = lastCharpter
@@ -180,12 +181,15 @@ func twoPickLinks(d *colly.Collector) {
 				lid, err := o.Insert(&lists)
 				if err == nil {
 					spew.Dump(lid)
+					go ComicsCopy(link, 2)
 					//_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
 					//if err2 != nil {
 					//	spew.Dump("漫画链接存入错误")
 					//}
 					//go ComicsCopy(link, 1)
 				}
+			} else {//存在
+
 			}
 		}
 
@@ -230,17 +234,14 @@ func threePickLinks(d *colly.Collector) {
 	})
 }
 
-
-
-
-
-
 //操作图书
 func ComicsCopy(domin string, rootId int) {
 	//获取指定规则
 	role := conf.Choose(rootId)
 	//爬取图书
 	bookInfo, chapterInfo := BookInfo(role, domin, false)
+	spew.Dump(bookInfo, chapterInfo)
+	os.Exit(1)
 	//图书ID
 	bId := 0
 	o := orm.NewOrm()
