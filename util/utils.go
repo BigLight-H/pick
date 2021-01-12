@@ -171,8 +171,9 @@ func GetKeys(domain string, number int) int {
 	j := 1
 	keys := 0
 	for k := range RootLinks {
-		if domain == RootLinks[j] {
+		if strings.Compare(domain, RootLinks[j]) == 0 {
 			keys = k
+			continue
 		}
 		j++
 	}

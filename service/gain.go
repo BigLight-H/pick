@@ -49,8 +49,6 @@ func BookThreeLists(domain string, rid int) {
 		lastLink := e.ChildText("./span[1]")
 		allPage := util.ChapterListOrder(lastLink, " ", 1)
 		allNum, _ := strconv.Atoi(allPage)
-		spew.Dump(allNum,allPage)
-		os.Exit(1)
 		for i := 1; i <= allNum; i++ {
 			//获取分页数据并存入数据库
 			go GetLinks(domain + "page/" + strconv.Itoa(i) + "/", rid)
