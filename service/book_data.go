@@ -19,6 +19,7 @@ func BookInfo(role *conf.MainRule, domin string, caches bool) ([]map[string]stri
 	//链接redis
 	redisPool := models.ConnectRedisPool()
 	defer redisPool.Close()
+	spew.Dump(domin)
 	c.OnXML(role.Table, func(e *colly.XMLElement) {
 		//章节名
 		title := e.ChildText(role.Title)
