@@ -27,7 +27,7 @@ func BookTwoLists(domain string, rid int) {
 
 	// Find and visit all links
 	c.OnXML("//body/div[6]/div[1]/div[2]/div[1]/div[6]/ul[1]/li[7]", func(e *colly.XMLElement) {
-		lastLink := e.ChildText("//a")
+		lastLink := e.ChildText("./a")
 		allNum, _ := strconv.Atoi(lastLink)
 		for i := 1; i <= allNum; i++ {
 			//获取分页数据并存入数据库
@@ -201,23 +201,28 @@ func threePickLinks(d *colly.Collector) {
 			t2 := ""
 			if link != "" {
 				o := orm.NewOrm()
+				//查询同名章节是否存在
 				lists := models.Links{}
-				lists.BookLink = link
-				lists.BookName = title
-				lists.LastChapter = lastCharpter
-				lists.Status = 0
-				lists.Type = t1 + "," + t2
-				lists.Source = 3
-				lists.ChapterNum = util.GetNumber(lastCharpter)
-				lid, err := o.Insert(&lists)
-				if err == nil {
-					spew.Dump(lid)
-					//os.Exit(1)
-					//_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
-					//if err2 != nil {
-					//	spew.Dump("漫画链接存入错误")
-					//}
-					//go ComicsCopy(link, 1)
+				err := o.QueryTable("book_links").Filter("book_name", title).One(&lists)
+				if err == orm.ErrNoRows {
+					//没有找到记录
+					lists.BookLink = link
+					lists.BookName = title
+					lists.LastChapter = lastCharpter
+					lists.Status = 0
+					lists.Type = t1 + "," + t2
+					lists.Source = 3
+					lists.ChapterNum = util.GetNumber(lastCharpter)
+					lid, err := o.Insert(&lists)
+					if err == nil {
+						spew.Dump(lid)
+						//os.Exit(1)
+						//_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
+						//if err2 != nil {
+						//	spew.Dump("漫画链接存入错误")
+						//}
+						//go ComicsCopy(link, 1)
+					}
 				}
 			}
 		}
