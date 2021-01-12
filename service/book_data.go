@@ -28,6 +28,7 @@ func BookInfo(role *conf.MainRule, domin string, caches bool, rootId int) ([]map
 		//util.MKdirs(dir+"\\"+title)
 		//章节链接
 		link := util.GetLinkPrefix(rootId)+e.ChildText(role.Link)
+		spew.Dump(role.Table,link)
 		isExist, _ := redisPool.Do("HEXISTS", "chapter_links", link)
 		//章节链接不存在redis里面采集
 		if isExist != int64(1) || caches {
