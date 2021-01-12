@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gocolly/colly"
 	"pick/conf"
 	"pick/models"
@@ -25,6 +26,7 @@ func BookInfo(role *conf.MainRule, domin string, caches bool) ([]map[string]stri
 		//util.MKdirs(dir+"\\"+title)
 		//章节链接
 		link := e.ChildText(role.Link)
+		spew.Dump(title, link)
 		isExist, _ := redisPool.Do("HEXISTS", "chapter_links", link)
 		//章节链接不存在redis里面采集
 		if isExist != int64(1) || caches {
