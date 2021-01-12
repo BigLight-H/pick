@@ -170,7 +170,7 @@ func twoPickLinks(d *colly.Collector) {
 			lists := models.Links{}
 			err := o.QueryTable("book_links").Filter("book_name", title).One(&lists)
 			if err == orm.ErrNoRows {
-				lists.BookLink = link
+				lists.BookLink = "https://manhwasmut.com/"+link
 				lists.BookName = title
 				lists.LastChapter = lastCharpter
 				lists.Status = 0
