@@ -108,7 +108,7 @@ func Comics(domin string, rootId int, caches bool) {
 	//获取指定规则
 	role := conf.Choose(rootId)
 	//爬取图书
-	bookInfo, chapterInfo := service.BookInfo(role, domin, caches)
+	bookInfo, chapterInfo := service.BookInfo(role, domin, caches, rootId)
 	//图书ID
 	bId := 0
 	o := orm.NewOrm()
