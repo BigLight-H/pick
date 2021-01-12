@@ -68,7 +68,7 @@ func Choose(id int) *MainRule {
 			}
 		case 2:
 			return &MainRule{
-				Table:   "//div[@id='list-chapters']/p",
+				Table:   "//body/div[6]/div[1]/div[1]/div[3]/div[1]/p",
 				Body :   "//body/div[6]/div[1]/div[1]/div[1]",
 				Name :   "//body/div[6]/div[1]/ol[1]/li[3]/a[1]/span",
 				Year :   "./div[2]/ul[1]/i",
