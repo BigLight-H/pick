@@ -161,7 +161,7 @@ func onePickLinks(d *colly.Collector) {
 
 func twoPickLinks(d *colly.Collector) {
 	d.OnXML("//body/div[6]/div[1]/div[2]/div[1]/div[5]/div", func(f *colly.XMLElement) {
-		link := "https://manhwasmut.com/"+f.ChildText("./div[1]/a[1]/@href")
+		link := util.GetLinkPrefix(2)+f.ChildText("./div[1]/a[1]/@href")
 		title := f.ChildText("./div[1]/div[1]/h3[1]/a")
 		lastCharpter := f.ChildText("./div[1]/div[1]/a")
 		t1 := f.ChildText("./div[1]/div[1]/small[1]/a[1]")
@@ -171,7 +171,7 @@ func twoPickLinks(d *colly.Collector) {
 			lists := models.Links{}
 			err := o.QueryTable("book_links").Filter("book_name", title).One(&lists)
 			if err == orm.ErrNoRows {//不存在
-				lists.BookLink = "https://manhwasmut.com/"+link
+				lists.BookLink = util.GetLinkPrefix(2)+link
 				lists.BookName = title
 				lists.LastChapter = lastCharpter
 				lists.Status = 0
@@ -239,7 +239,7 @@ func ComicsCopy(domin string, rootId int) {
 	//获取指定规则
 	role := conf.Choose(rootId)
 	//爬取图书
-	bookInfo, chapterInfo := BookInfo(role, domin, false)
+	bookInfo, chapterInfo := BookInfo(role, domin, false, rootId)
 	spew.Dump(bookInfo, chapterInfo)
 	os.Exit(1)
 	//图书ID

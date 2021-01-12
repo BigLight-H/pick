@@ -5,10 +5,11 @@ import (
 	"github.com/gocolly/colly"
 	"pick/conf"
 	"pick/models"
+	"pick/util"
 )
 
 //书目录
-func BookInfo(role *conf.MainRule, domin string, caches bool) ([]map[string]string, []map[string]string) {
+func BookInfo(role *conf.MainRule, domin string, caches bool, rootId int) ([]map[string]string, []map[string]string) {
 	//图书信息
 	var bookInfo []map[string]string
 	//章节信息
@@ -26,7 +27,7 @@ func BookInfo(role *conf.MainRule, domin string, caches bool) ([]map[string]stri
 		//创建章节目录
 		//util.MKdirs(dir+"\\"+title)
 		//章节链接
-		link := e.ChildText(role.Link)
+		link := util.GetLinkPrefix(rootId)+e.ChildText(role.Link)
 		isExist, _ := redisPool.Do("HEXISTS", "chapter_links", link)
 		//章节链接不存在redis里面采集
 		if isExist != int64(1) || caches {

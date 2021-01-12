@@ -199,3 +199,12 @@ func GetNumber(str string) string {
 func StrFirstToBig(str string) string {
 	return strings.ToTitle(strings.ToLower(str))
 }
+
+//获取链接前缀
+func GetLinkPrefix(rootId int) string {
+	prefix, err := config.String("root_link_"+strconv.Itoa(rootId))
+	if err != nil {
+		return prefix
+	}
+	return ""
+}
