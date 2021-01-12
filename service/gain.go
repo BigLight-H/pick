@@ -38,6 +38,29 @@ func BookTwoLists(domain string, rid int) {
 }
 
 /**
+ * 获取源三总页数
+ */
+func BookThreeLists(domain string, rid int) {
+	//图片信息
+	c := colly.NewCollector()
+
+	// Find and visit all links
+	c.OnXML("//body/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/div[3]/div[1]", func(e *colly.XMLElement) {
+		lastLink := e.ChildText("./span[1]")
+		util.ChapterListOrder(lastLink, " ", 1)
+		allNum, _ := strconv.Atoi(lastLink)
+		spew.Dump(allNum)
+		os.Exit(1)
+		for i := 1; i <= allNum; i++ {
+			//获取分页数据并存入数据库
+			go GetLinks(domain + "page/" + strconv.Itoa(i) + "/", rid)
+		}
+	})
+	c.Visit(domain)
+}
+
+
+/**
  * 获取源一总页数
  */
 func BookLists(domain string, rid int) {
@@ -69,6 +92,9 @@ func GetLinks(pageDomain string, rid int) {
 			break
 		case 2:
 			twoPickLinks(d)
+			break
+		case 3:
+			threePickLinks(d)
 			break
 	}
 
@@ -162,6 +188,41 @@ func twoPickLinks(d *colly.Collector) {
 
 	})
 }
+
+func threePickLinks(d *colly.Collector) {
+	d.OnXML("//body/div[6]/div[1]/div[2]/div[1]/div[5]/div", func(f *colly.XMLElement) {
+		link := f.ChildText("./div[1]/a[1]/@href")
+		title := f.ChildText("./div[1]/div[1]/h3[1]/a/text()")
+		lastCharpter := f.ChildText("./div[1]/div[1]/a")
+		t1 := f.ChildText("./div[1]/div[1]/small[1]/a[1]/text()")
+		t2 := ""
+		if link != "" {
+			o := orm.NewOrm()
+			lists := models.Links{}
+			lists.BookLink = link
+			lists.BookName = title
+			lists.LastChapter = lastCharpter
+			lists.Status = 0
+			lists.Type = t1 + "," + t2
+			lid, err := o.Insert(&lists)
+			if err == nil {
+				spew.Dump(lid)
+				os.Exit(1)
+				//_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
+				//if err2 != nil {
+				//	spew.Dump("漫画链接存入错误")
+				//}
+				//go ComicsCopy(link, 1)
+			}
+		}
+
+	})
+}
+
+
+
+
+
 
 //操作图书
 func ComicsCopy(domin string, rootId int) {

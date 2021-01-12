@@ -6,8 +6,8 @@ import (
 )
 
 //根据链接转发源
-func WhereGo(domain string)  {
-	rid := util.GetKeys(domain)
+func WhereGo(domain string, num int)  {
+	rid := util.GetKeys(domain, num)
 	spew.Dump(rid)
 	switch rid {
 		case 1:
@@ -15,6 +15,9 @@ func WhereGo(domain string)  {
 			break
 		case 2:
 			BookTwoLists(domain, rid)
+			break
+		case 3:
+			BookThreeLists(domain, rid)
 			break
 	}
 }

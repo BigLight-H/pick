@@ -161,12 +161,12 @@ func MinusProcessNum() {
 	}
 }
 
-func GetKeys(domain string) int {
+func GetKeys(domain string, number int) int {
 	RootLinks := make(map[int]string)
-	sone, _ := config.String("source_one")
-	stwo, _ := config.String("source_two")
-	RootLinks[1] = sone
-	RootLinks[2] = stwo
+	for i := 1; i <= number; i++ {
+		val, _ := config.String("source_"+strconv.Itoa(i))
+		RootLinks[i] = val
+	}
 	// 数组默认长度为map长度,后面append时,不需要重新申请内存和拷贝,效率较高
 	j := 1
 	keys := 0
@@ -177,4 +177,9 @@ func GetKeys(domain string) int {
 		j++
 	}
 	return keys
+}
+
+func StrToInt(str string) int {
+	number, _ := strconv.Atoi(str)
+	return number
 }
