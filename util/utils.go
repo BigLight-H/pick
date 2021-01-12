@@ -203,7 +203,7 @@ func StrFirstToBig(str string) string {
 //获取链接前缀
 func GetLinkPrefix(rootId int) string {
 	prefix, err := config.String("root_link_"+strconv.Itoa(rootId))
-	if err != nil {
+	if err == nil {
 		return prefix
 	}
 	return ""
