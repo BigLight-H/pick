@@ -161,7 +161,7 @@ func onePickLinks(d *colly.Collector) {
 
 func twoPickLinks(d *colly.Collector) {
 	d.OnXML("//body/div[6]/div[1]/div[2]/div[1]/div[5]/div", func(f *colly.XMLElement) {
-		link := f.ChildText("./div[1]/a[1]/@href")
+		link := "https://manhwasmut.com"+f.ChildText("./div[1]/a[1]/@href")
 		title := f.ChildText("./div[1]/div[1]/h3[1]/a")
 		lastCharpter := f.ChildText("./div[1]/div[1]/a")
 		t1 := f.ChildText("./div[1]/div[1]/small[1]/a[1]")
