@@ -238,6 +238,7 @@ func threePickLinks(d *colly.Collector) {
 func ComicsCopy(domin string, rootId int) {
 	//获取指定规则
 	role := conf.Choose(rootId)
+	spew.Dump(role, domin)
 	//爬取图书
 	bookInfo, chapterInfo := BookInfo(role, domin, false)
 	spew.Dump(bookInfo, chapterInfo)
