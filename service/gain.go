@@ -193,10 +193,10 @@ func twoPickLinks(d *colly.Collector) {
 
 func threePickLinks(d *colly.Collector) {
 	d.OnXML("//div[@id='loop-content']", func(f *colly.XMLElement) {
-		for a := 1; a <= 2; a++ {
-			link := f.ChildText("./div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/h3[1]/a[1]/@href")
-			title := f.ChildText("./div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/h3[1]/a[1]")
-			lastCharpter := f.ChildText("./div[1]/div[1]/div[1]/div[1]/div[2]/div[3]/div[1]/span[1]/a[1]")
+		for a := 1; a <= 4; a++ {
+			link := f.ChildText("./div[" + strconv.Itoa(a) + "]/div[1]/div[1]/div[1]/div[2]/div[1]/h3[1]/a[1]/@href")
+			title := f.ChildText("./div[" + strconv.Itoa(a) + "]/div[1]/div[1]/div[1]/div[2]/div[1]/h3[1]/a[1]")
+			lastCharpter := f.ChildText("./div[" + strconv.Itoa(a) + "]/div[1]/div[1]/div[1]/div[2]/div[3]/div[1]/span[1]/a[1]")
 			t1 := ""
 			t2 := ""
 			if link != "" {
@@ -212,7 +212,7 @@ func threePickLinks(d *colly.Collector) {
 				lid, err := o.Insert(&lists)
 				if err == nil {
 					spew.Dump(lid)
-					os.Exit(1)
+					//os.Exit(1)
 					//_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
 					//if err2 != nil {
 					//	spew.Dump("漫画链接存入错误")
