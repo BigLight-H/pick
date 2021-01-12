@@ -20,7 +20,7 @@ func BookInfo(role *conf.MainRule, domin string, caches bool, rootId int) ([]map
 	//链接redis
 	redisPool := models.ConnectRedisPool()
 	defer redisPool.Close()
-	spew.Dump(domin,role.Table)
+
 	c.OnXML(role.Table, func(e *colly.XMLElement) {
 		//章节名
 		title := e.ChildText(role.Title)
@@ -37,7 +37,7 @@ func BookInfo(role *conf.MainRule, domin string, caches bool, rootId int) ([]map
 				ctime = e.ChildText(role.NCTime)
 			}
 			img := GetDetail(role, link)
-			spew.Dump(role.Table)
+			spew.Dump(role.Table,link)
 			chapterInfo = append(
 				chapterInfo,
 				map[string]string{"link": link, "title": title, "imgs": img, "ctime":ctime})
