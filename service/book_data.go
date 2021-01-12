@@ -81,6 +81,7 @@ func GetDetail(role *conf.MainRule, domin string) string {
 	cs.OnXML(role.Detail, func(e *colly.XMLElement) {
 		//章节链接
 		imgLink := e.ChildText(role.ImgSrc)
+		spew.Dump(domin,imgLink)
 		//存入指定图片目录
 		//imgArr := strings.Split(imgLink, "/")
 		//name := imgArr[len(imgArr)-1]
