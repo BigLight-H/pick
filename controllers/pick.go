@@ -100,7 +100,7 @@ func (p *PickController) MsgBack(msg string, status int)  {
 		status,
 	}
 	p.Data["json"] = data
-	p.ServeJSON()
+	_ = p.ServeJSON()
 }
 
 //操作图书

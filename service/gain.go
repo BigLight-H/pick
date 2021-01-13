@@ -194,7 +194,7 @@ func twoPickLinks(pageDomain string) {
 					//查看更新
 					list := models.Links{Id: lId}
 					list.LastChapter = lastCharpter
-					lists.ChapterNum = util.GetNumber(lastCharpter)
+					list.ChapterNum = util.GetNumber(lastCharpter)
 					if num1, err3 := o.Update(&list, "LastChapter", "ChapterNum"); err3 == nil {
 						//有更新改变字段值
 						if num1 == int64(1) {
