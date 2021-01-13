@@ -309,7 +309,7 @@ func ComicsCopy(domin string, rootId int) {
 					//新建文件目录
 					util.MKdirs(bookid)
 					//下载封面图片到目录
-					DownloadJpg(v["image"], bookid+"/"+bookid+"_thumb.jpg", false)
+					DownloadJpg(v["image"], bookid+"/"+bookid+"_thumb.jpg", false, rootId)
 				}
 				_, err := redisPool.Do("HSET", "comic_links", domin, bId)
 				if err != nil {
@@ -365,10 +365,10 @@ func ComicsCopy(domin string, rootId int) {
 							//创建章节目录
 							util.MKdirs(bookid + "/" + epid)
 							//下载章节首张图片
-							DownloadJpg(fImg, imgRole, false)
+							DownloadJpg(fImg, imgRole, false,rootId)
 							//下载图片
 							if s["imgs"] != "" {
-								go DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"], false)
+								go DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"], false, rootId)
 							}
 						}
 					}
@@ -381,7 +381,7 @@ func ComicsCopy(domin string, rootId int) {
 						if num > int64(0) {
 							//下载图片
 							if s["imgs"] != "" {
-								go DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"], false)
+								go DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"], false, rootId)
 							}
 						}
 					}
@@ -391,7 +391,7 @@ func ComicsCopy(domin string, rootId int) {
 	}
 }
 
-func DownloadJpg(url string, file_name string, caches bool)  {
+func DownloadJpg(url string, file_name string, caches bool, rootId int)  {
 	comicHub, _ := config.String("comic_hub")
 	bs := util.Exists(comicHub + file_name)
 	if bs && !caches {
@@ -407,7 +407,8 @@ func DownloadJpg(url string, file_name string, caches bool)  {
 		}
 
 		req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36")
-		req.Header.Add("Referer","https://www.webtoon.xyz/")
+		referer := util.Referer(rootId)
+		req.Header.Add("Referer",referer)
 
 		req.Close = true
 
@@ -430,7 +431,7 @@ func DownloadJpg(url string, file_name string, caches bool)  {
 	}
 }
 
-func DoWork(dir string, imgs string, bid string, eid string, link string, caches bool) {
+func DoWork(dir string, imgs string, bid string, eid string, link string, caches bool, rootId int) {
 	imgArr := strings.Split(imgs, ",")
 	//删除第最后一个元素
 	if len(imgArr) > 0 {
@@ -440,7 +441,7 @@ func DoWork(dir string, imgs string, bid string, eid string, link string, caches
 			//imgAr := strings.Split(value, "/")
 			//name := imgAr[len(imgAr)-1]
 			if name != "" {
-				go DownloadJpg(value, dir+"/"+bid+"0"+eid+name, caches)
+				go DownloadJpg(value, dir+"/"+bid+"0"+eid+name, caches, rootId)
 			}
 		}
 		//存储章节爬取记录

@@ -156,7 +156,7 @@ func Comics(domin string, rootId int, caches bool) {
 					//新建文件目录
 					util.MKdirs(bookid)
 					//下载封面图片到目录
-					service.DownloadJpg(v["image"], bookid+"/"+bookid+"_thumb.jpg", false)
+					service.DownloadJpg(v["image"], bookid+"/"+bookid+"_thumb.jpg", false, rootId)
 				}
 				_, err := redisPool.Do("HSET", "comic_links", domin, bId)
 				if err != nil {
@@ -173,7 +173,7 @@ func Comics(domin string, rootId int, caches bool) {
 				//新建文件目录
 				util.MKdirs(bookid)
 				//下载封面图片到目录
-				service.DownloadJpg(v["image"], bookid+"/"+bookid+"_thumb.jpg", false)
+				service.DownloadJpg(v["image"], bookid+"/"+bookid+"_thumb.jpg", false, rootId)
 				oldBook := models.BookList{BookId: bId}
 				oldBook.LastTime = v["ltime"]
 				if num, err := o.Update(&oldBook, "LastTime"); err != nil {
@@ -216,9 +216,9 @@ func Comics(domin string, rootId int, caches bool) {
 						//创建章节目录
 						util.MKdirs(bookid + "/" + epid)
 						//下载章节首张图片
-						service.DownloadJpg(fImg, imgRole, false)
+						service.DownloadJpg(fImg, imgRole, false, rootId)
 						if s["imgs"] != "" {
-							go service.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"], caches)
+							go service.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"], caches, rootId)
 						}
 					}
 				} else {
@@ -230,9 +230,9 @@ func Comics(domin string, rootId int, caches bool) {
 						//创建章节目录
 						util.MKdirs(bookid + "/" + epid)
 						//下载章节首张图片
-						service.DownloadJpg(fImg, imgRole, false)
+						service.DownloadJpg(fImg, imgRole, false, rootId)
 						if s["imgs"] != "" {
-							go service.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"],caches)
+							go service.DoWork(bookid+"/"+epid, s["imgs"], bookid, epid, s["link"], caches, rootId)
 						}
 					}
 				}

@@ -250,3 +250,11 @@ func GetEpids(str string, rootId int, para string) string {
 	return epid
 }
 
+//获取网站Referer
+func Referer(rootId int) string {
+	domain := ""
+	for i := 1; i <= 3; i++ {
+		domain, _ = config.String("referer_"+strconv.Itoa(i))
+	}
+	return domain
+}
