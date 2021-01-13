@@ -181,7 +181,7 @@ func twoPickLinks(d *colly.Collector) {
 				lid, err := o.Insert(&lists)
 				if err == nil {
 					spew.Dump(lid)
-					go ComicsCopy(link, 2)
+					ComicsCopy(link, 2)
 					//_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
 					//if err2 != nil {
 					//	spew.Dump("漫画链接存入错误")
