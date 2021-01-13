@@ -9,7 +9,6 @@ import (
 	"github.com/gocolly/colly"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"pick/conf"
 	"pick/models"
 	"pick/util"
@@ -31,10 +30,10 @@ func BookTwoLists(domain string, rid int) {
 		allNum, _ := strconv.Atoi(lastLink)
 		for i := 1; i <= allNum; i++ {
 			//获取分页数据并存入数据库
-			GetLinks(domain + "page=" + strconv.Itoa(i) + "", rid)
+			go GetLinks(domain + "page=" + strconv.Itoa(i) + "", rid)
 		}
 	})
-	c.Visit(domain)
+	_ = c.Visit(domain)
 }
 
 /**
@@ -178,8 +177,8 @@ func twoPickLinks(pageDomain string) {
 				lists.ChapterNum = util.GetNumber(lastCharpter)
 				lid, err := o.Insert(&lists)
 				if err == nil {
-					spew.Dump(lid)
-					ComicsCopy(util.GetLinkPrefix(2)+link, 2)
+					spew.Dump("源2存入:"+strconv.Itoa(int(lid)))
+					go ComicsCopy(util.GetLinkPrefix(2)+link, 2)
 					//_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
 					//if err2 != nil {
 					//	spew.Dump("漫画链接存入错误")
@@ -187,7 +186,26 @@ func twoPickLinks(pageDomain string) {
 					//go ComicsCopy(link, 1)
 				}
 			} else {//存在
-				ComicsCopy(util.GetLinkPrefix(2)+link, 2)
+				err1 := o.QueryTable("book_links").Filter("book_link", util.GetLinkPrefix(2)+link).Filter("book_name", title).One(&lists)
+				if err1 == orm.ErrNoRows { //存在就修改
+				} else {
+					lId := lists.Id
+					spew.Dump("源2修改:"+strconv.Itoa(int(lId)))
+					//查看更新
+					list := models.Links{Id: lId}
+					list.LastChapter = lastCharpter
+					lists.ChapterNum = util.GetNumber(lastCharpter)
+					if num1, err3 := o.Update(&list, "LastChapter", "ChapterNum"); err3 == nil {
+						//有更新改变字段值
+						if num1 == int64(1) {
+							lists.Status = 1
+							if num2, err4 := o.Update(&list, "Status"); err4 != nil {
+								spew.Dump(num2)
+							}
+						}
+						go ComicsCopy(util.GetLinkPrefix(2)+link, 2)
+					}
+				}
 			}
 		}
 
@@ -244,8 +262,6 @@ func ComicsCopy(domin string, rootId int) {
 	role := conf.Choose(rootId)
 	//爬取图书
 	bookInfo, chapterInfo := BookInfo(role, domin, false, rootId)
-	spew.Dump(bookInfo, chapterInfo)
-	os.Exit(1)
 	//图书ID
 	bId := 0
 	o := orm.NewOrm()
@@ -318,8 +334,7 @@ func ComicsCopy(domin string, rootId int) {
 	if bId > 0 {
 		for _, s := range chapterInfo {
 			//切割链接
-			_, son := util.GetSubdirectory(s["link"])
-			epid := util.ChapterOrder(son, "-", 1)
+			epid := util.GetEpids(s["link"], rootId, "chapter-")
 			//存入章节表
 			c := orm.NewOrm()
 			chapter := models.BookEpisode{}
@@ -420,10 +435,13 @@ func DoWork(dir string, imgs string, bid string, eid string, link string, caches
 	//删除第最后一个元素
 	if len(imgArr) > 0 {
 		imgArr = imgArr[:len(imgArr)-1]
-		for _, value := range imgArr{
-			imgAr := strings.Split(value, "/")
-			name := imgAr[len(imgAr)-1]
-			go DownloadJpg(value, dir+"/"+bid+"0"+eid+name, caches)
+		for k, value := range imgArr{
+			name := util.GetImgName(k)
+			//imgAr := strings.Split(value, "/")
+			//name := imgAr[len(imgAr)-1]
+			if name != "" {
+				go DownloadJpg(value, dir+"/"+bid+"0"+eid+name, caches)
+			}
 		}
 		//存储章节爬取记录
 		redisPool := models.ConnectRedisPool()

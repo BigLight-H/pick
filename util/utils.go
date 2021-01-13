@@ -208,3 +208,45 @@ func GetLinkPrefix(rootId int) string {
 	}
 	return ""
 }
+
+//获取生成的图片名称
+func GetImgName(k int) string {
+	key := k + 1
+	name := ""
+	if key < 10 {
+		name = "00" + strconv.Itoa(key) + ".jpg"
+	}
+	if key > 9 && key < 100 {
+		name = "0" + strconv.Itoa(key) + ".jpg"
+	}
+	if key > 99 {
+		name = strconv.Itoa(key) + ".jpg"
+	}
+	return name
+}
+
+//获取指定数值作为图书章节ID
+func GetEpids(str string, rootId int, para string) string {
+	epid := ""
+	if str == "" {
+		return epid
+	}
+	comma := strings.Index(str, para)
+	pos := 0
+	if rootId == 1 {
+		pos = strings.Index(str[comma:], "/")
+	}
+	if rootId == 2 {
+		pos = strings.Index(str[comma:], ".html")
+	}
+	if rootId == 3 {
+		pos = strings.Index(str[comma:], "/")
+	}
+	newstr := str[comma:]
+	if pos > 0 {
+		epid = strings.Replace(newstr[8:pos], ".", "-", -1)
+	}
+	epid = strings.Replace(newstr[8:], ".", "-", -1)
+	return epid
+}
+

@@ -84,7 +84,7 @@ func Choose(id int) *MainRule {
 				Detail : "//body/section[1]/div[4]/article[1]/img",
 				ImgSrc : "./@data-original",
 				LTime : "./div[6]/div[1]/div[1]/div[3]/div[1]/p[1]/span[2]/i[1]/time[1]",
-				CTime : "./div[6]/div[1]/div[1]/div[3]/div[1]/p[1]/span[2]/i[1]/time",
+				CTime : "./span[2]/i[1]/time[1]",
 				NTime : "./div[6]/div[1]/div[1]/div[3]/div[1]/p[2]/span[2]/i[1]/time[1]",
 				NCTime : "//span[1]/span[1]/a[1]/img[1]/@alt",
 			}

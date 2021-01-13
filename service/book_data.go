@@ -1,7 +1,6 @@
 package service
 
 import (
-	"github.com/davecgh/go-spew/spew"
 	"github.com/gocolly/colly"
 	"pick/conf"
 	"pick/models"
@@ -28,7 +27,6 @@ func BookInfo(role *conf.MainRule, domin string, caches bool, rootId int) ([]map
 		//util.MKdirs(dir+"\\"+title)
 		//章节链接
 		link := util.GetLinkPrefix(rootId)+e.ChildText(role.Link)
-		spew.Dump(link+"11111111111111111111111111111111")
 		isExist, _ := redisPool.Do("HEXISTS", "chapter_links", link)
 		//章节链接不存在redis里面采集
 		if isExist != int64(1) || caches {
@@ -37,7 +35,6 @@ func BookInfo(role *conf.MainRule, domin string, caches bool, rootId int) ([]map
 			if ctime == "" {
 				ctime = e.ChildText(role.NCTime)
 			}
-			spew.Dump(link+"222222222")
 			img := GetDetail(role, link)
 			chapterInfo = append(
 				chapterInfo,
@@ -80,11 +77,9 @@ func BookInfo(role *conf.MainRule, domin string, caches bool, rootId int) ([]map
 func GetDetail(role *conf.MainRule, domin string) string {
 	cs := colly.NewCollector()
 	var img string
-	spew.Dump(domin+"详情页"+role.Detail+"888888"+role.ImgSrc)
 	cs.OnXML(role.Detail, func(e *colly.XMLElement) {
 		//章节链接
 		imgLink := e.ChildText(role.ImgSrc)
-		spew.Dump(domin+"----"+imgLink)
 		//存入指定图片目录
 		//imgArr := strings.Split(imgLink, "/")
 		//name := imgArr[len(imgArr)-1]
