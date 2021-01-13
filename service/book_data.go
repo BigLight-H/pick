@@ -79,6 +79,7 @@ func BookInfo(role *conf.MainRule, domin string, caches bool, rootId int) ([]map
 func GetDetail(role *conf.MainRule, domin string) string {
 	cs := colly.NewCollector()
 	var img string
+	spew.Dump(domin+"详情页"+role.Detail+"888888"+role.ImgSrc)
 	cs.OnXML(role.Detail, func(e *colly.XMLElement) {
 		//章节链接
 		imgLink := e.ChildText(role.ImgSrc)
