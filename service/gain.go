@@ -159,7 +159,7 @@ func onePickLinks(pageDomain string) {
 func twoPickLinks(pageDomain string) {
 	d := colly.NewCollector()
 	d.OnXML("//body/div[6]/div[1]/div[2]/div[1]/div[5]/div", func(f *colly.XMLElement) {
-		link := util.GetLinkPrefix(2)+f.ChildText("./div[1]/a[1]/@href")
+		link := f.ChildText("./div[1]/a[1]/@href")
 		title := f.ChildText("./div[1]/div[1]/h3[1]/a")
 		lastCharpter := f.ChildText("./div[1]/div[1]/a")
 		t1 := f.ChildText("./div[1]/div[1]/small[1]/a[1]")
@@ -179,7 +179,7 @@ func twoPickLinks(pageDomain string) {
 				lid, err := o.Insert(&lists)
 				if err == nil {
 					spew.Dump(lid)
-					ComicsCopy(link, 2)
+					ComicsCopy(util.GetLinkPrefix(2)+link, 2)
 					//_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
 					//if err2 != nil {
 					//	spew.Dump("漫画链接存入错误")
@@ -187,7 +187,7 @@ func twoPickLinks(pageDomain string) {
 					//go ComicsCopy(link, 1)
 				}
 			} else {//存在
-				ComicsCopy(link, 2)
+				ComicsCopy(util.GetLinkPrefix(2)+link, 2)
 			}
 		}
 
