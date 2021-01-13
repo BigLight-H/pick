@@ -31,12 +31,12 @@ func BookInfo(role *conf.MainRule, domin string, caches bool, rootId int) ([]map
 		isExist, _ := redisPool.Do("HEXISTS", "chapter_links", link)
 		//章节链接不存在redis里面采集
 		if isExist != int64(1) || caches {
-			spew.Dump(333)
 			//章节更新时间
 			ctime := e.ChildText(role.CTime)
 			if ctime == "" {
 				ctime = e.ChildText(role.NCTime)
 			}
+			spew.Dump(link)
 			img := GetDetail(role, link)
 			chapterInfo = append(
 				chapterInfo,
