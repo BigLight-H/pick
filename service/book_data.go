@@ -37,7 +37,7 @@ func BookInfo(role *conf.MainRule, domin string, caches bool, rootId int) ([]map
 			if ctime == "" {
 				ctime = e.ChildText(role.NCTime)
 			}
-
+			spew.Dump(link+"222222222")
 			img := GetDetail(role, link)
 			chapterInfo = append(
 				chapterInfo,
