@@ -91,7 +91,7 @@ func GetDetail(role *conf.MainRule, domin string) string {
 		//util.DownloadJpg(imgLink, file_name+"\\"+name)
 		img += imgLink+","
 	})
-	cs.Visit(domin)
+	_ = cs.Visit(domin)
 	return  img
 }
 

@@ -82,25 +82,21 @@ func BookLists(domain string, rid int) {
  * 获取源一链接
  */
 func GetLinks(pageDomain string, rid int) {
-	d := colly.NewCollector()
-	//var wg sync.WaitGroup
 	switch rid {
 		case 1:
-			onePickLinks(d)
+			onePickLinks(pageDomain)
 			break
 		case 2:
-			twoPickLinks(d)
+			twoPickLinks(pageDomain)
 			break
 		case 3:
-			threePickLinks(d)
+			threePickLinks(pageDomain)
 			break
 	}
-
-	d.Visit(pageDomain)
-	//wg.Wait()
 }
 
-func onePickLinks(d *colly.Collector) {
+func onePickLinks(pageDomain string) {
+	d := colly.NewCollector()
 	d.OnXML("//body/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]/div[1]/div[1]/div", func(f *colly.XMLElement) {
 		for a := 1; a <= 2; a++ {
 			//链接redis
@@ -157,9 +153,11 @@ func onePickLinks(d *colly.Collector) {
 		}
 		//os.Exit(2)
 	})
+	_ = d.Visit(pageDomain)
 }
 
-func twoPickLinks(d *colly.Collector) {
+func twoPickLinks(pageDomain string) {
+	d := colly.NewCollector()
 	d.OnXML("//body/div[6]/div[1]/div[2]/div[1]/div[5]/div", func(f *colly.XMLElement) {
 		link := util.GetLinkPrefix(2)+f.ChildText("./div[1]/a[1]/@href")
 		title := f.ChildText("./div[1]/div[1]/h3[1]/a")
@@ -194,9 +192,11 @@ func twoPickLinks(d *colly.Collector) {
 		}
 
 	})
+	_ = d.Visit(pageDomain)
 }
 
-func threePickLinks(d *colly.Collector) {
+func threePickLinks(pageDomain string) {
+	d := colly.NewCollector()
 	d.OnXML("//div[@id='loop-content']/div", func(f *colly.XMLElement) {
 		for a := 1; a <= 4; a++ {
 			link := f.ChildText("./div[1]/div[" + strconv.Itoa(a) + "]/div[1]/div[2]/div[1]/h3[1]/a[1]/@href")
@@ -221,6 +221,7 @@ func threePickLinks(d *colly.Collector) {
 					lid, err := o.Insert(&lists)
 					if err == nil {
 						spew.Dump(lid)
+						ComicsCopy(link, 3)
 						//os.Exit(1)
 						//_, err2 := redisPool.Do("HSET", "book_all_lists", link, lid)
 						//if err2 != nil {
@@ -228,10 +229,13 @@ func threePickLinks(d *colly.Collector) {
 						//}
 						//go ComicsCopy(link, 1)
 					}
+				} else {
+					ComicsCopy(link, 3)
 				}
 			}
 		}
 	})
+	_ = d.Visit(pageDomain)
 }
 
 //操作图书
