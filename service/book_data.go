@@ -28,6 +28,7 @@ func BookInfo(role *conf.MainRule, domin string, caches bool, rootId int) ([]map
 		//util.MKdirs(dir+"\\"+title)
 		//章节链接
 		link := util.GetLinkPrefix(rootId)+e.ChildText(role.Link)
+		spew.Dump(link+"11111111111111111111111111111111")
 		isExist, _ := redisPool.Do("HEXISTS", "chapter_links", link)
 		//章节链接不存在redis里面采集
 		if isExist != int64(1) || caches {
@@ -36,7 +37,7 @@ func BookInfo(role *conf.MainRule, domin string, caches bool, rootId int) ([]map
 			if ctime == "" {
 				ctime = e.ChildText(role.NCTime)
 			}
-			spew.Dump(link)
+
 			img := GetDetail(role, link)
 			chapterInfo = append(
 				chapterInfo,
