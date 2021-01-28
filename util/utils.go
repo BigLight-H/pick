@@ -109,7 +109,7 @@ func DownloadJpg(url string, file_name string, caches bool)  {
 		byteCotent, e := ioutil.ReadAll(resp.Body)
 		HandError(e)
 
-		ioutil.WriteFile(beego.AppConfig.String("comic_hub") + OutStr(file_name), byteCotent, 0777)
+		ioutil.WriteFile(beego.AppConfig.String("comic_hub") + OutStr(file_name, "n"), byteCotent, 0777)
 		spew.Dump("已下载图片链接"+url)
 	}
 }
@@ -439,8 +439,8 @@ func MinusProcessNum() {
 }
 
 //去除字符串中指定字符
-func OutStr(n string) string {
+func OutStr(str string, n string) string {
 	replacer := strings.NewReplacer(n, "")
-	out := replacer.Replace(refString)
+	out := replacer.Replace(str)
 	return out
 }
