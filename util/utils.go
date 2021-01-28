@@ -437,3 +437,10 @@ func MinusProcessNum() {
 		spew.Dump("增加完成数值错误")
 	}
 }
+
+//去除字符串中指定字符
+func OutStr(n string) string {
+	replacer := strings.NewReplacer(n, "")
+	out := replacer.Replace(refString)
+	return out
+}
