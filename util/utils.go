@@ -109,7 +109,7 @@ func DownloadJpg(url string, file_name string, caches bool)  {
 		byteCotent, e := ioutil.ReadAll(resp.Body)
 		HandError(e)
 
-		ioutil.WriteFile(beego.AppConfig.String("comic_hub") + file_name, byteCotent, 0777)
+		ioutil.WriteFile(beego.AppConfig.String("comic_hub") + OutStr(file_name), byteCotent, 0777)
 		spew.Dump("已下载图片链接"+url)
 	}
 }
